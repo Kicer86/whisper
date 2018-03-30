@@ -21,10 +21,20 @@
 
 #include <QObject>
 
+class QTcpServer;
 
-class Server: public QObject
+class Server final: public QObject
 {
         Q_OBJECT
+
+    public:
+        Server(QObject * = nullptr);
+        ~Server();
+
+        void start();
+
+    private:
+        QTcpServer* m_server;
 };
 
 #endif // SERVER_HPP

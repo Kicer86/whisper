@@ -17,3 +17,28 @@
  */
 
 #include "server.hpp"
+
+#include <cassert>
+#include <QTcpServer>
+
+
+Server::Server(QObject* p):
+    QObject(p),
+    m_server(new QTcpServer)
+{
+}
+
+
+Server::~Server()
+{
+    m_server->close();
+}
+
+
+void Server::start()
+{
+    const bool status = m_server->listen(QHostAddress::Any, 1234);
+
+    assert(status);
+}
+
