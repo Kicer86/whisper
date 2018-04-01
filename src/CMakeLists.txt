@@ -8,6 +8,8 @@ qt5_wrap_cpp(WRAPPED_CPP
 )
 
 add_executable(whisper
+                client.cpp
+                client.hpp
                 main.cpp
                 main_window.cpp
                 main_window.hpp
