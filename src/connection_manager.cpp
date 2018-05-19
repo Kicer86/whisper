@@ -17,3 +17,19 @@
  */
 
 #include "connection_manager.hpp"
+
+#include "client.hpp"
+#include "server.hpp"
+
+
+ConnectionManager::ConnectionManager(IUserManager* userMgr):
+    QObject(),
+    m_userManager(userMgr)
+{
+}
+
+
+ConnectionManager::~ConnectionManager()
+{
+
+}

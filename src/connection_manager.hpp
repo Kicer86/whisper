@@ -26,14 +26,18 @@
 
 class Server;
 class Client;
+struct IUserManager;
 
 class ConnectionManager: public QObject
 {
     public:
+        ConnectionManager(IUserManager *);
+        ~ConnectionManager();
 
     private:
         std::unique_ptr<Server> m_server;
         std::unique_ptr<Client> m_client;
+        IUserManager* m_userManager;
 };
 
 #endif // CONNECTIONMANAGER_HPP
