@@ -18,6 +18,8 @@ add_executable(whisper
                 main_window.hpp
                 server.cpp
                 server.hpp
+                user_list_widget.cpp
+                user_list_widget.hpp
                 user_manager.cpp
                 user_manager.hpp
 
