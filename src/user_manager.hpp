@@ -19,9 +19,20 @@
 #ifndef USERMANAGER_HPP
 #define USERMANAGER_HPP
 
+#include <QString>
+#include <QVector>
 
-class UserManager
+typedef int UserId;
+
+class UserManager final
 {
+    public:
+        UserManager();
+        ~UserManager();
+
+        QVector<UserId> listUsers() const;
+        QString name(const UserId &) const;
+        QString address(const UserId &) const;
 };
 
 #endif // USERMANAGER_HPP

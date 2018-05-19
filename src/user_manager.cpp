@@ -17,3 +17,35 @@
  */
 
 #include "user_manager.hpp"
+
+
+UserManager::UserManager()
+{
+
+}
+
+
+UserManager::~UserManager()
+{
+
+}
+
+
+QVector<UserId> UserManager::listUsers() const
+{
+    QVector<UserId> result;
+
+    return result;
+}
+
+
+QString UserManager::name(const UserId&) const
+{
+    return QString();
+}
+
+
+QString UserManager::address(const UserId&) const
+{
+    return QString();
+}
