@@ -17,6 +17,8 @@ add_executable(whisper
                 main_window.hpp
                 server.cpp
                 server.hpp
+                user_manager.cpp
+                user_manager.hpp
 
                 ${WRAPPED_CPP}
 )
