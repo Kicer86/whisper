@@ -19,12 +19,10 @@
 #ifndef USERMANAGER_HPP
 #define USERMANAGER_HPP
 
-#include <QString>
-#include <QVector>
+#include "iuser_manager.hpp"
 
-typedef int UserId;
 
-class UserManager final
+class UserManager final: public IUserManager
 {
     public:
         UserManager();

@@ -12,6 +12,7 @@ add_executable(whisper
                 client.hpp
                 connection_manager.cpp
                 connection_manager.hpp
+                iuser_manager.hpp
                 main.cpp
                 main_window.cpp
                 main_window.hpp
