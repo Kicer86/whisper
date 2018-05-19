@@ -21,9 +21,11 @@
 
 #include <QMainWindow>
 
-class MainWindow: public QMainWindow
+class MainWindow final: public QMainWindow
 {
-
+    public:
+        MainWindow();
+        ~MainWindow();
 };
 
 #endif // MAINWINDOW_HPP

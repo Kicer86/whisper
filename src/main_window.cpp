@@ -17,3 +17,21 @@
  */
 
 #include "main_window.hpp"
+
+#include <QDockWidget>
+
+#include "user_list_widget.hpp"
+
+MainWindow::MainWindow()
+{
+    setCentralWidget(new QWidget(this));
+
+    QDockWidget* userListDock = new QDockWidget(tr("Users"), this);
+    userListDock->setWidget(new UserListWidget(this));
+    addDockWidget(Qt::RightDockWidgetArea, userListDock);
+}
+
+
+MainWindow::~MainWindow()
+{
+}
