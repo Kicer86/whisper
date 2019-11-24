@@ -3,6 +3,9 @@
 #include <QCommandLineParser>
 #include <QStandardPaths>
 
+#include <OpenLibrary/utils_qt/configuration.hpp>
+#include <OpenLibrary/utils_qt/configuration_json_storage.hpp>
+
 #include "main_window.hpp"
 
 int main(int argc, char** argv)
@@ -21,6 +24,9 @@ int main(int argc, char** argv)
     cmdLineParser.process(app);
 
     const QString configDir = cmdLineParser.value(configDirOption);
+
+    ConfigJsonStorage configStorage(configDir + "/config.json");
+    Configuration configuration(configStorage);
 
     MainWindow main_window;
     main_window.show();
