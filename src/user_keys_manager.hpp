@@ -18,11 +18,22 @@
 #ifndef USERKEYSMANAGER_HPP
 #define USERKEYSMANAGER_HPP
 
+#include <QString>
+
 /**
- * @todo Class for managing user's cryptographic keys
+ * @brief Class for managing user's cryptographic keys
  */
 class UserKeysManager
 {
+    public:
+        UserKeysManager(const QString& keys_dir);
+
+        bool privateKeyExists() const;
+        bool publicKeyExists() const;
+        void generateKeysPair() const;
+
+    private:
+        const QString m_keysDir;
 };
 
 #endif // USERKEYSMANAGER_HPP

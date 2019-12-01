@@ -16,3 +16,27 @@
  */
 
 #include "user_keys_manager.hpp"
+
+UserKeysManager::UserKeysManager(const QString& keys_dir)
+    : m_keysDir(keys_dir)
+{
+
+}
+
+
+bool UserKeysManager::privateKeyExists() const
+{
+    return false;
+}
+
+
+bool UserKeysManager::publicKeyExists() const
+{
+    return false;
+}
+
+
+void UserKeysManager::generateKeysPair() const
+{
+
+}
