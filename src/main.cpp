@@ -28,6 +28,8 @@ int main(int argc, char** argv)
     ConfigJsonStorage configStorage(configDir + "/config.json");
     Configuration configuration(configStorage);
 
+    configuration.setDefaultValue("port", 1234);
+
     MainWindow main_window;
     main_window.show();
 
