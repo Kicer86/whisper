@@ -2,6 +2,7 @@
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(OpenLibrary 2.4 REQUIRED COMPONENTS utils_qt)
+find_package(OpenSSL 1.1.1 REQUIRED)
 
 
 qt5_wrap_cpp(WRAPPED_CPP
@@ -41,5 +42,6 @@ target_link_libraries(whisper
                         Qt5::Widgets
                         Qt5::Network
                         OpenLibrary::utils_qt
+                        OpenSSL::Crypto
 )
 

@@ -30,7 +30,7 @@ class UserKeysManager
 
         bool privateKeyExists() const;
         bool publicKeyExists() const;
-        void generateKeysPair() const;
+        bool generateKeysPair() const;
 
     private:
         const QString m_keysDir;
