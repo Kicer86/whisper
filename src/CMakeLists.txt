@@ -1,6 +1,7 @@
 
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Network REQUIRED)
+find_package(OpenLibrary 2.4 REQUIRED COMPONENTS utils_qt)
 
 
 qt5_wrap_cpp(WRAPPED_CPP
@@ -26,6 +27,17 @@ add_executable(whisper
                 ${WRAPPED_CPP}
 )
 
-target_include_directories(whisper SYSTEM PRIVATE ${Qt5Widgets_INCLUDE_DIRS} ${Qt5Netwok_INCLUDE_DIRS})
-target_link_libraries(whisper PRIVATE Qt5::Widgets Qt5::Network)
+target_include_directories(whisper
+                            SYSTEM PRIVATE
+                                ${Qt5Widgets_INCLUDE_DIRS}
+                                ${Qt5Netwok_INCLUDE_DIRS}
+                                ${OPENLIBRARY_INCLUDE_DIRS}
+)
+
+target_link_libraries(whisper
+                        PRIVATE
+                        Qt5::Widgets
+                        Qt5::Network
+                        OpenLibrary::utils_qt
+)
 
