@@ -3,11 +3,6 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(OpenLibrary 2.4 REQUIRED COMPONENTS utils_qt)
 
-
-qt5_wrap_cpp(WRAPPED_CPP
-                server.hpp
-)
-
 add_executable(whisper
                 client.cpp
                 client.hpp
@@ -23,8 +18,6 @@ add_executable(whisper
                 user_list_widget.hpp
                 user_manager.cpp
                 user_manager.hpp
-
-                ${WRAPPED_CPP}
 )
 
 target_include_directories(whisper
@@ -41,3 +34,5 @@ target_link_libraries(whisper
                         OpenLibrary::utils_qt
 )
 
+
+set_target_properties(whisper PROPERTIES AUTOMOC TRUE)
