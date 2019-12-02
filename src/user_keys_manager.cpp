@@ -52,13 +52,17 @@ UserKeysManager::UserKeysManager(const QString& keys_dir)
 
 bool UserKeysManager::privateKeyExists() const
 {
-    return false;
+    const bool exists = QFile::exists(privateKeyPath());
+
+    return exists;
 }
 
 
 bool UserKeysManager::publicKeyExists() const
 {
-    return false;
+    const bool exists = QFile::exists(publicKeyPath());
+
+    return exists;
 }
 
 
