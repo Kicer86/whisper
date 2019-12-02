@@ -8,6 +8,7 @@
 
 #include "main_window.hpp"
 #include "user_keys_manager.hpp"
+#include "server.hpp"
 
 int main(int argc, char** argv)
 {
@@ -34,6 +35,9 @@ int main(int argc, char** argv)
 
     if (manager.privateKeyExists() == false || manager.publicKeyExists() == false)
         manager.generateKeysPair();
+
+    Server server(configuration.getEntry("port").toInt());
+    server.start();
 
     MainWindow main_window;
     main_window.show();
