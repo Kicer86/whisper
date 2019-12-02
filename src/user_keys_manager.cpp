@@ -79,9 +79,6 @@ bool UserKeysManager::generateKeysPair() const
         RSA_ptr rsa(RSA_new(), ::RSA_free);
         check_ssl_status( RSA_generate_key_ex(rsa.get(), bits, bn.get(), nullptr) );
 
-        //EVP_KEY_ptr pkey(EVP_PKEY_new(), ::EVP_PKEY_free);
-        //check_ssl_status( EVP_PKEY_set1_RSA(pkey.get(), rsa.get()) );
-
         BIO_FILE_ptr pem_pub(BIO_new_file(public_key_path.toStdString().c_str(), "w"), ::BIO_free);
         check_ssl_status( PEM_write_bio_RSAPublicKey(pem_pub.get(), rsa.get()) );
 
