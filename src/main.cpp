@@ -9,6 +9,8 @@
 #include "main_window.hpp"
 #include "user_keys_manager.hpp"
 #include "server.hpp"
+#include "client.hpp"
+
 
 int main(int argc, char** argv)
 {
@@ -38,6 +40,11 @@ int main(int argc, char** argv)
 
     Server server(configuration.getEntry("port").toInt());
     server.start();
+
+    // temporary debug code
+    Client client;
+    if (configuration.getEntry("port").toInt() != 1234)
+        client.connectoTo("localhost", 1234);
 
     MainWindow main_window;
     main_window.show();
