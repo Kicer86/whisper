@@ -17,3 +17,39 @@
  */
 
 #include "client.hpp"
+
+#include <iostream>
+#include <memory>
+
+#include <QSslSocket>
+
+
+void Client::connectoTo(const QString& host, quint16 port)
+{
+    QSslSocket* clientSocket = new QSslSocket;
+
+    clientSocket->connectToHostEncrypted(host, port);
+
+    connect(clientSocket, &QSslSocket::encrypted, this, &Client::socketEncrypted);
+    connect(clientSocket, &QSslSocket::stateChanged, this, &Client::socketStateChanged);
+    connect(clientSocket, qOverload<const QList<QSslError> &>(&QSslSocket::sslErrors), this, &Client::socketSslErrors);
+}
+
+
+void Client::socketEncrypted()
+{
+    std::cout << "client socket encrypted\n";
+}
+
+
+void Client::socketStateChanged(QAbstractSocket::SocketState socketState)
+{
+    std::cout << "client socket state changed to " << socketState << "\n";
+}
+
+
+void Client::socketSslErrors(const QList<QSslError>& errors)
+{
+    for(const QSslError& error: errors)
+        std::cout << "client socket error: " << error.errorString().toStdString() << "\n";
+}

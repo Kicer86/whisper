@@ -19,10 +19,20 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
+#include <QAbstractSocket>
 #include <QObject>
+#include <QSslError>
+
 
 class Client: public QObject
 {
+    public:
+        void connectoTo(const QString& host, quint16 port);
+
+    private:
+        void socketEncrypted();
+        void socketStateChanged(QAbstractSocket::SocketState socketState);
+        void socketSslErrors(const QList<QSslError> &errors);
 };
 
 #endif // CLIENT_HPP
