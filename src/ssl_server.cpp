@@ -16,3 +16,27 @@
  */
 
 #include "ssl_server.hpp"
+
+#include <QSslSocket>
+
+
+void SslServer::incomingConnection(qintptr socketDescriptor)
+{
+    QSslSocket *serverSocket = new QSslSocket;
+
+    if (serverSocket->setSocketDescriptor(socketDescriptor))
+    {
+        addPendingConnection(serverSocket);
+        connect(serverSocket, &QSslSocket::encrypted, this, &SslServer::ready);
+        serverSocket->startServerEncryption();
+    }
+    else
+    {
+        delete serverSocket;
+    }
+}
+
+
+void SslServer::ready()
+{
+}

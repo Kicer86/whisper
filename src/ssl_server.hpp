@@ -23,12 +23,13 @@
 /**
  * @brief SSL extension for QTcpServer
  */
-class SslServer : public QTcpServer
+class SslServer final: public QTcpServer
 {
     public:
 
     private:
-
+        void incomingConnection(qintptr);
+        void ready();
 };
 
 #endif // SSLSERVER_HPP
