@@ -7,6 +7,7 @@
 #include <OpenLibrary/utils_qt/configuration_json_storage.hpp>
 
 #include "main_window.hpp"
+#include "user_keys_manager.hpp"
 
 int main(int argc, char** argv)
 {
@@ -27,8 +28,12 @@ int main(int argc, char** argv)
 
     ConfigJsonStorage configStorage(configDir + "/config.json");
     Configuration configuration(configStorage);
-
     configuration.setDefaultValue("port", 1234);
+
+    UserKeysManager manager(configDir + "/user_keys");
+
+    if (manager.privateKeyExists() == false || manager.publicKeyExists() == false)
+        manager.generateKeysPair();
 
     MainWindow main_window;
     main_window.show();
