@@ -28,13 +28,14 @@ class Server final: public QObject
         Q_OBJECT
 
     public:
-        Server(int port, QObject * = nullptr);
+        Server(quint16 port, QObject * = nullptr);
         ~Server();
 
         void start();
 
     private:
         SslServer m_server;
+        quint16 m_port;
 };
 
 #endif // SERVER_HPP

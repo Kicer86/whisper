@@ -22,9 +22,10 @@
 #include <QTcpServer>
 
 
-Server::Server(int port, QObject* p):
+Server::Server(quint16 port, QObject* p):
     QObject(p),
-    m_server()
+    m_server(),
+    m_port(port)
 {
 }
 
@@ -37,7 +38,7 @@ Server::~Server()
 
 void Server::start()
 {
-    const bool status = m_server.listen(QHostAddress::Any, 1234);
+    const bool status = m_server.listen(QHostAddress::Any, m_port);
 
     assert(status);
 }
