@@ -31,7 +31,9 @@ int main(int argc, char** argv)
     configuration.setDefaultValue("port", 1234);
 
     UserKeysManager manager(configDir + "/user_keys");
-    manager.generateKeysPair();
+
+    if (manager.privateKeyExists() == false || manager.publicKeyExists() == false)
+        manager.generateKeysPair();
 
     MainWindow main_window;
     main_window.show();
