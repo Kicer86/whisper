@@ -34,6 +34,7 @@ void SslServer::incomingConnection(qintptr socketDescriptor)
         connect(sslSocket, &QSslSocket::encrypted, this, &SslServer::socketEncrypted);
         connect(sslSocket, &QSslSocket::stateChanged, this, &SslServer::socketStateChanged);
         connect(sslSocket, qOverload<const QList<QSslError> &>(&QSslSocket::sslErrors), this, &SslServer::socketSslErrors);
+        connect(sslSocket, qOverload<QAbstractSocket::SocketError>(&QSslSocket::error), this, &SslServer::socketError);
         sslSocket->startServerEncryption();
     }
 }
@@ -55,4 +56,10 @@ void SslServer::socketSslErrors(const QList<QSslError>& errors)
 {
     for(const QSslError& error: errors)
         std::cout << "client socket error: " << error.errorString().toStdString() << "\n";
+}
+
+
+void SslServer::socketError(QAbstractSocket::SocketError error)
+{
+    std::cout << "client socket error " << error << "\n";
 }

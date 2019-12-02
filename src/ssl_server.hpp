@@ -33,6 +33,7 @@ class SslServer final: public QTcpServer
         void socketEncrypted();
         void socketStateChanged(QAbstractSocket::SocketState socketState);
         void socketSslErrors(const QList<QSslError> &errors);
+        void socketError(QAbstractSocket::SocketError);
 };
 
 #endif // SSLSERVER_HPP
