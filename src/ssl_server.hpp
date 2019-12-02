@@ -19,6 +19,7 @@
 #define SSLSERVER_HPP
 
 #include <QTcpServer>
+#include <QSslSocket>
 
 /**
  * @brief SSL extension for QTcpServer
@@ -29,7 +30,9 @@ class SslServer final: public QTcpServer
 
     private:
         void incomingConnection(qintptr);
-        void ready();
+        void socketEncrypted();
+        void socketStateChanged(QAbstractSocket::SocketState socketState);
+        void socketSslErrors(const QList<QSslError> &errors);
 };
 
 #endif // SSLSERVER_HPP

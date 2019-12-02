@@ -17,6 +17,7 @@
 
 #include "ssl_server.hpp"
 
+#include <iostream>
 #include <memory>
 #include <QSslSocket>
 
@@ -30,13 +31,28 @@ void SslServer::incomingConnection(qintptr socketDescriptor)
         QSslSocket* sslSocket = serverSocket.release();
 
         addPendingConnection(sslSocket);
-        connect(sslSocket, &QSslSocket::encrypted, this, &SslServer::ready);
+        connect(sslSocket, &QSslSocket::encrypted, this, &SslServer::socketEncrypted);
+        connect(sslSocket, &QSslSocket::stateChanged, this, &SslServer::socketStateChanged);
+        connect(sslSocket, qOverload<const QList<QSslError> &>(&QSslSocket::sslErrors), this, &SslServer::socketSslErrors);
         sslSocket->startServerEncryption();
     }
 }
 
 
-void SslServer::ready()
+void SslServer::socketEncrypted()
 {
+    std::cout << "client socket encrypted\n";
+}
 
+
+void SslServer::socketStateChanged(QAbstractSocket::SocketState socketState)
+{
+    std::cout << "client socket state changed to " << socketState << "\n";
+}
+
+
+void SslServer::socketSslErrors(const QList<QSslError>& errors)
+{
+    for(const QSslError& error: errors)
+        std::cout << "client socket error: " << error.errorString().toStdString() << "\n";
 }
