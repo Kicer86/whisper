@@ -70,8 +70,8 @@ bool UserKeysManager::generateKeysPair() const
     {
         QDir().mkpath(m_keysDir);
 
-        const QString private_key_path = QString("%1/%2").arg(m_keysDir).arg("rsa-private.pem");
-        const QString public_key_path = QString("%1/%2").arg(m_keysDir).arg("rsa-public.pem");
+        const QString private_key_path = privateKeyPath();
+        const QString public_key_path = publicKeyPath();
 
         BN_ptr bn(BN_new(), ::BN_free);
         check_ssl_status( BN_set_word(bn.get(), RSA_F4) );
@@ -95,3 +95,16 @@ bool UserKeysManager::generateKeysPair() const
 
     return status;
 }
+
+
+QString UserKeysManager::publicKeyPath() const
+{
+    return QString("%1/%2").arg(m_keysDir).arg("rsa-public.pem");
+}
+
+
+QString UserKeysManager::privateKeyPath() const
+{
+    return QString("%1/%2").arg(m_keysDir).arg("rsa-private.pem");
+}
+

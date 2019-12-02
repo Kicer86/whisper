@@ -34,6 +34,9 @@ class UserKeysManager
 
     private:
         const QString m_keysDir;
+
+        QString privateKeyPath() const;
+        QString publicKeyPath() const;
 };
 
 #endif // USERKEYSMANAGER_HPP
