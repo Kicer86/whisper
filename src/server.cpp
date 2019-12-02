@@ -22,22 +22,22 @@
 #include <QTcpServer>
 
 
-Server::Server(QObject* p):
+Server::Server(int port, QObject* p):
     QObject(p),
-    m_server(new QTcpServer)
+    m_server()
 {
 }
 
 
 Server::~Server()
 {
-    m_server->close();
+    m_server.close();
 }
 
 
 void Server::start()
 {
-    const bool status = m_server->listen(QHostAddress::Any, 1234);
+    const bool status = m_server.listen(QHostAddress::Any, 1234);
 
     assert(status);
 }

@@ -21,20 +21,20 @@
 
 #include <QObject>
 
-class QTcpServer;
+#include "ssl_server.hpp"
 
 class Server final: public QObject
 {
         Q_OBJECT
 
     public:
-        Server(QObject * = nullptr);
+        Server(int port, QObject * = nullptr);
         ~Server();
 
         void start();
 
     private:
-        QTcpServer* m_server;
+        SslServer m_server;
 };
 
 #endif // SERVER_HPP
