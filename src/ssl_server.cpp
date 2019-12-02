@@ -17,26 +17,26 @@
 
 #include "ssl_server.hpp"
 
+#include <memory>
 #include <QSslSocket>
 
 
 void SslServer::incomingConnection(qintptr socketDescriptor)
 {
-    QSslSocket *serverSocket = new QSslSocket;
+    std::unique_ptr<QSslSocket> serverSocket = std::make_unique<QSslSocket>();
 
     if (serverSocket->setSocketDescriptor(socketDescriptor))
     {
-        addPendingConnection(serverSocket);
-        connect(serverSocket, &QSslSocket::encrypted, this, &SslServer::ready);
-        serverSocket->startServerEncryption();
-    }
-    else
-    {
-        delete serverSocket;
+        QSslSocket* sslSocket = serverSocket.release();
+
+        addPendingConnection(sslSocket);
+        connect(sslSocket, &QSslSocket::encrypted, this, &SslServer::ready);
+        sslSocket->startServerEncryption();
     }
 }
 
 
 void SslServer::ready()
 {
+
 }
