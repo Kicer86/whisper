@@ -15,6 +15,8 @@ add_executable(whisper
                 main_window.hpp
                 server.cpp
                 server.hpp
+                ssl_server.cpp
+                ssl_server.hpp
                 user_keys_manager.cpp
                 user_keys_manager.hpp
                 user_list_widget.cpp
