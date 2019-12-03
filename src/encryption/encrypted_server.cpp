@@ -17,6 +17,25 @@
 
 #include "encrypted_server.hpp"
 
-#include <iostream>
 #include <memory>
-#include <QSslSocket>
+#include <QTcpSocket>
+
+#include "encrypted_connection.hpp"
+
+
+EncryptedServer::EncryptedServer()
+{
+    connect(this, &QTcpServer::newConnection, this, &EncryptedServer::newConnection);
+}
+
+
+void EncryptedServer::newConnection()
+{
+    while(hasPendingConnections())
+    {
+        QTcpSocket* socket = nextPendingConnection();
+
+        auto encrypted_connection = std::make_unique<EncryptedConnection>(socket);
+        encrypted_connection.release();
+    }
+}

@@ -19,7 +19,6 @@
 #define ENCRYPTEDSERVER_HPP
 
 #include <QTcpServer>
-#include <QSslSocket>
 
 /**
  * @brief Server providing encrypted connections
@@ -27,8 +26,10 @@
 class EncryptedServer final: public QTcpServer
 {
     public:
+        EncryptedServer();
 
     private:
+        void newConnection();
 };
 
 #endif // ENCRYPTEDSERVER_HPP
