@@ -29,11 +29,6 @@ class EncryptedServer final: public QTcpServer
     public:
 
     private:
-        void incomingConnection(qintptr);
-        void socketEncrypted();
-        void socketStateChanged(QAbstractSocket::SocketState socketState);
-        void socketSslErrors(const QList<QSslError> &errors);
-        void socketError(QAbstractSocket::SocketError);
 };
 
 #endif // ENCRYPTEDSERVER_HPP
