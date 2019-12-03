@@ -9,6 +9,7 @@
 #include "main_window.hpp"
 #include "user_keys_manager.hpp"
 #include "server.hpp"
+#include "encryption/encrypted_client.hpp"
 
 
 int main(int argc, char** argv)
@@ -41,9 +42,9 @@ int main(int argc, char** argv)
     server.start();
 
     // temporary debug code
-    //Client client;
-    //if (configuration.getEntry("port").toInt() != 1234)
-    //    client.connectoTo("localhost", 1234);
+    EncryptedClient client;
+    if (configuration.getEntry("port").toInt() != 1234)
+        client.makeConnection("localhost", 1234);
 
     MainWindow main_window;
     main_window.show();
