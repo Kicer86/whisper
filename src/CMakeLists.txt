@@ -5,9 +5,11 @@ find_package(OpenLibrary 2.4 REQUIRED COMPONENTS utils_qt)
 find_package(OpenSSL 1.1.1 REQUIRED)
 
 add_executable(whisper
-                encryption/iencrypted_connection.hpp
+                encryption/encrypted_connection.cpp
+                encryption/encrypted_connection.hpp
                 encryption/encrypted_server.cpp
                 encryption/encrypted_server.hpp
+                encryption/iencrypted_connection.hpp
                 client.cpp
                 client.hpp
                 connection_manager.cpp
