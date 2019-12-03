@@ -6,6 +6,8 @@ find_package(OpenSSL 1.1.1 REQUIRED)
 
 add_executable(whisper
                 encryption/iencrypted_connection.hpp
+                encryption/ssl_server.cpp
+                encryption/ssl_server.hpp
                 client.cpp
                 client.hpp
                 connection_manager.cpp
@@ -16,8 +18,6 @@ add_executable(whisper
                 main_window.hpp
                 server.cpp
                 server.hpp
-                ssl_server.cpp
-                ssl_server.hpp
                 user_keys_manager.cpp
                 user_keys_manager.hpp
                 user_list_widget.cpp

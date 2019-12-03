@@ -21,7 +21,7 @@
 
 #include <QObject>
 
-#include "ssl_server.hpp"
+#include "encryption/ssl_server.hpp"
 
 class Server final: public QObject
 {
