@@ -10,10 +10,6 @@ add_executable(whisper
                 encryption/encrypted_server.cpp
                 encryption/encrypted_server.hpp
                 encryption/iencrypted_connection.hpp
-                client.cpp
-                client.hpp
-                connection_manager.cpp
-                connection_manager.hpp
                 iuser_manager.hpp
                 main.cpp
                 main_window.cpp
