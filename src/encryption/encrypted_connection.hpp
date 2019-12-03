@@ -21,12 +21,22 @@
 
 #include "iencrypted_connection.hpp"
 
+#include <QTcpSocket>
 
 /**
  * @brief representation of encrypted connection
  */
-class EncryptedConnection: public IEncryptedConnection
+
+class EncryptedConnection: public QObject, public IEncryptedConnection
 {
+    public:
+        EncryptedConnection(QTcpSocket* socket);
+
+    private:
+        QTcpSocket* m_socket;
+
+        void socketStateChanged(QAbstractSocket::SocketState socketState);
+        void socketError(QAbstractSocket::SocketError);
 };
 
 
