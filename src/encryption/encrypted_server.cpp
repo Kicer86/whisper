@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ssl_server.hpp"
+#include "encrypted_server.hpp"
 
 #include <iostream>
 #include <memory>
 #include <QSslSocket>
 
 
-void SslServer::incomingConnection(qintptr socketDescriptor)
+void EncryptedServer::incomingConnection(qintptr socketDescriptor)
 {
     std::unique_ptr<QSslSocket> serverSocket = std::make_unique<QSslSocket>();
 
@@ -31,35 +31,35 @@ void SslServer::incomingConnection(qintptr socketDescriptor)
         QSslSocket* sslSocket = serverSocket.release();
 
         addPendingConnection(sslSocket);
-        connect(sslSocket, &QSslSocket::encrypted, this, &SslServer::socketEncrypted);
-        connect(sslSocket, &QSslSocket::stateChanged, this, &SslServer::socketStateChanged);
-        connect(sslSocket, qOverload<const QList<QSslError> &>(&QSslSocket::sslErrors), this, &SslServer::socketSslErrors);
-        connect(sslSocket, qOverload<QAbstractSocket::SocketError>(&QSslSocket::error), this, &SslServer::socketError);
+        connect(sslSocket, &QSslSocket::encrypted, this, &EncryptedServer::socketEncrypted);
+        connect(sslSocket, &QSslSocket::stateChanged, this, &EncryptedServer::socketStateChanged);
+        connect(sslSocket, qOverload<const QList<QSslError> &>(&QSslSocket::sslErrors), this, &EncryptedServer::socketSslErrors);
+        connect(sslSocket, qOverload<QAbstractSocket::SocketError>(&QSslSocket::error), this, &EncryptedServer::socketError);
         sslSocket->startServerEncryption();
     }
 }
 
 
-void SslServer::socketEncrypted()
+void EncryptedServer::socketEncrypted()
 {
     std::cout << "client socket encrypted\n";
 }
 
 
-void SslServer::socketStateChanged(QAbstractSocket::SocketState socketState)
+void EncryptedServer::socketStateChanged(QAbstractSocket::SocketState socketState)
 {
     std::cout << "client socket state changed to " << socketState << "\n";
 }
 
 
-void SslServer::socketSslErrors(const QList<QSslError>& errors)
+void EncryptedServer::socketSslErrors(const QList<QSslError>& errors)
 {
     for(const QSslError& error: errors)
         std::cout << "client socket error: " << error.errorString().toStdString() << "\n";
 }
 
 
-void SslServer::socketError(QAbstractSocket::SocketError error)
+void EncryptedServer::socketError(QAbstractSocket::SocketError error)
 {
     std::cout << "client socket error " << error << "\n";
 }

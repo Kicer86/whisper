@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SSLSERVER_HPP
-#define SSLSERVER_HPP
+#ifndef ENCRYPTEDSERVER_HPP
+#define ENCRYPTEDSERVER_HPP
 
 #include <QTcpServer>
 #include <QSslSocket>
 
 /**
- * @brief SSL extension for QTcpServer
+ * @brief Server providing encrypted connections
  */
-class SslServer final: public QTcpServer
+class EncryptedServer final: public QTcpServer
 {
     public:
 
@@ -36,4 +36,4 @@ class SslServer final: public QTcpServer
         void socketError(QAbstractSocket::SocketError);
 };
 
-#endif // SSLSERVER_HPP
+#endif // ENCRYPTEDSERVER_HPP

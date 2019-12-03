@@ -21,7 +21,7 @@
 
 #include <QObject>
 
-#include "encryption/ssl_server.hpp"
+#include "encryption/encrypted_server.hpp"
 
 class Server final: public QObject
 {
@@ -34,7 +34,7 @@ class Server final: public QObject
         void start();
 
     private:
-        SslServer m_server;
+        EncryptedServer m_server;
         quint16 m_port;
 };
 
