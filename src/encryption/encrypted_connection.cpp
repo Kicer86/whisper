@@ -30,11 +30,11 @@ EncryptedConnection::EncryptedConnection(QTcpSocket* socket):
 
 void EncryptedConnection::socketStateChanged(QAbstractSocket::SocketState socketState)
 {
-    std::cout << "client socket state changed to " << socketState << "\n";
+    std::cout << "client socket state changed to: " << socketState << "\n";
 }
 
 
 void EncryptedConnection::socketError(QAbstractSocket::SocketError)
 {
-    std::cout << "client socket state changed to " << m_socket->errorString().toStdString() << "\n";
+    std::cout << "client socket error: " << m_socket->errorString().toStdString() << "\n";
 }
