@@ -19,5 +19,5 @@
 
 void ConnectionManager::add(std::unique_ptr<IEncryptedConnection> connection)
 {
-
+    m_connections.emplace_back(std::move(connection));
 }
