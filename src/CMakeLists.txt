@@ -11,6 +11,8 @@ add_executable(whisper
                 encryption/encrypted_connection.hpp
                 encryption/encrypted_server.cpp
                 encryption/encrypted_server.hpp
+                encryption/identity.cpp
+                encryption/identity.hpp
                 encryption/iencrypted_connection.hpp
                 iuser_manager.hpp
                 main.cpp
