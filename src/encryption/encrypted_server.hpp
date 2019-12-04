@@ -20,6 +20,7 @@
 
 #include <QTcpServer>
 
+struct IConnectionManager;
 struct IIdentityChecker;
 
 /**
@@ -28,10 +29,11 @@ struct IIdentityChecker;
 class EncryptedServer final: public QTcpServer
 {
     public:
-        EncryptedServer(const IIdentityChecker &);
+        EncryptedServer(const IIdentityChecker &, IConnectionManager &);
 
     private:
         const IIdentityChecker& m_identityChecker;
+        IConnectionManager& m_connectionManager;
 
         void newConnection();
 };

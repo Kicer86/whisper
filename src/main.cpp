@@ -10,6 +10,7 @@
 #include "user_keys_manager.hpp"
 #include "server.hpp"
 #include "encryption/encrypted_client.hpp"
+#include "connection_manager.hpp"
 
 
 int main(int argc, char** argv)
@@ -38,7 +39,9 @@ int main(int argc, char** argv)
     if (manager.privateKeyExists() == false || manager.publicKeyExists() == false)
         manager.generateKeysPair();
 
-    Server server(configuration.getEntry("port").toInt());
+    ConnectionManager connectionManager;
+
+    Server server(connectionManager, configuration.getEntry("port").toInt());
     server.start();
 
     // temporary debug code

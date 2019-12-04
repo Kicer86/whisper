@@ -24,10 +24,10 @@
 #include "encryption/iidentity_checker.hpp"
 
 
-Server::Server(quint16 port, QObject* p):
+Server::Server(IConnectionManager& connection_manager, quint16 port, QObject* p):
     QObject(p),
     m_identityChecker(),
-    m_server(m_identityChecker),
+    m_server(m_identityChecker, connection_manager),
     m_port(port)
 {
 }

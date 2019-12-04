@@ -21,10 +21,12 @@
 #include <QTcpSocket>
 
 #include "encrypted_connection.hpp"
+#include "iconnection_manager.hpp"
 
 
-EncryptedServer::EncryptedServer(const IIdentityChecker& identityChecker)
+EncryptedServer::EncryptedServer(const IIdentityChecker& identityChecker, IConnectionManager& connection_manager)
     : m_identityChecker(identityChecker)
+    , m_connectionManager(m_connectionManager)
 {
     connect(this, &QTcpServer::newConnection, this, &EncryptedServer::newConnection);
 }
@@ -37,6 +39,6 @@ void EncryptedServer::newConnection()
         QTcpSocket* socket = nextPendingConnection();
 
         auto encrypted_connection = std::make_unique<EncryptedConnection>(socket);
-        encrypted_connection.release();
+        m_connectionManager.add(std::move(encrypted_connection));
     }
 }
