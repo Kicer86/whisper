@@ -21,5 +21,5 @@
 Identity::Identity(const QSslKey& public_key)
     : m_publicKey(public_key)
 {
-
+    /// @todo public_key should be checked for being valid
 }
