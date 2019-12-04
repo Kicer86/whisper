@@ -20,19 +20,21 @@
 #include <QTcpSocket>
 
 #include "encrypted_connection.hpp"
+#include "iconnection_manager.hpp"
 
 
-EncryptedClient::EncryptedClient()
+EncryptedClient::EncryptedClient(IConnectionManager& connection_manager)
+    : m_connectionManager(connection_manager)
 {
 }
 
 
-std::unique_ptr<IEncryptedConnection> EncryptedClient::makeConnection(const QString& address, quint16 port)
+void EncryptedClient::makeConnection(const QString& address, quint16 port)
 {
     QTcpSocket* socket = new QTcpSocket;
     socket->connectToHost(address, port);
 
     auto encryptedConnection = std::make_unique<EncryptedConnection>(socket);
 
-    return encryptedConnection;
+    m_connectionManager.add(std::move(encryptedConnection));
 }

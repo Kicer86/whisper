@@ -23,15 +23,21 @@
 
 #include "iencrypted_connection.hpp"
 
+struct IConnectionManager;
+
+
 /**
  * @brief tool for making connections
  */
 class EncryptedClient
 {
     public:
-        EncryptedClient();
+        EncryptedClient(IConnectionManager &);
 
-        std::unique_ptr<IEncryptedConnection> makeConnection(const QString& address, quint16 port);
+        void makeConnection(const QString& address, quint16 port);
+
+    private:
+        IConnectionManager& m_connectionManager;
 };
 
 #endif // ENCRYPTEDCLIENT_HPP

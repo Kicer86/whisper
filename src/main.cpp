@@ -45,7 +45,7 @@ int main(int argc, char** argv)
     server.start();
 
     // temporary debug code
-    EncryptedClient client;
+    EncryptedClient client(connectionManager);
     if (configuration.getEntry("port").toInt() != 1234)
         client.makeConnection("localhost", 1234);
 
