@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONNECTIONMANAGER_H
-#define CONNECTIONMANAGER_H
+#ifndef CONNECTIONMANAGER_HPP
+#define CONNECTIONMANAGER_HPP
 
 #include <deque>
 
@@ -35,4 +35,4 @@ class ConnectionManager : public IConnectionManager
         std::deque<std::unique_ptr<IEncryptedConnection>> m_connections;
 };
 
-#endif // CONNECTIONMANAGER_H
+#endif // CONNECTIONMANAGER_HPP
