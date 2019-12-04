@@ -16,3 +16,10 @@
  */
 
 #include "identity.hpp"
+
+
+Identity::Identity(const QSslKey& public_key)
+    : m_publicKey(public_key)
+{
+
+}

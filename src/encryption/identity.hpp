@@ -18,11 +18,18 @@
 #ifndef IDENTITY_HPP
 #define IDENTITY_HPP
 
+#include <QSslKey>
+
 /**
  * @brief Identity details
  */
 class Identity
 {
+    public:
+        Identity(const QSslKey& public_key);
+
+    private:
+        QSslKey m_publicKey;
 };
 
 #endif // IDENTITY_HPP
