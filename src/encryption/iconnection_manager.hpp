@@ -2,6 +2,10 @@
 #ifndef ICONNECTION_MANAGER_HPP_INCLUDED
 #define ICONNECTION_MANAGER_HPP_INCLUDED
 
+#include <memory>
+
+struct IEncryptedConnection;
+
 
 struct IConnectionManager
 {
