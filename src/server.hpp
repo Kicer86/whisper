@@ -22,6 +22,7 @@
 #include <QObject>
 
 #include "encryption/encrypted_server.hpp"
+#include "identity_checker.hpp"
 
 class Server final: public QObject
 {
@@ -34,6 +35,7 @@ class Server final: public QObject
         void start();
 
     private:
+        IdentityChecker m_identityChecker;
         EncryptedServer m_server;
         quint16 m_port;
 };

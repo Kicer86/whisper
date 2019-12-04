@@ -21,10 +21,13 @@
 #include <cassert>
 #include <QTcpServer>
 
+#include "encryption/iidentity_checker.hpp"
+
 
 Server::Server(quint16 port, QObject* p):
     QObject(p),
-    m_server(),
+    m_identityChecker(),
+    m_server(m_identityChecker),
     m_port(port)
 {
 }

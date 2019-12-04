@@ -20,15 +20,19 @@
 
 #include <QTcpServer>
 
+struct IIdentityChecker;
+
 /**
  * @brief Server providing encrypted connections
  */
 class EncryptedServer final: public QTcpServer
 {
     public:
-        EncryptedServer();
+        EncryptedServer(const IIdentityChecker &);
 
     private:
+        const IIdentityChecker& m_identityChecker;
+
         void newConnection();
 };
 

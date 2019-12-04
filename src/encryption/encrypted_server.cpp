@@ -23,7 +23,8 @@
 #include "encrypted_connection.hpp"
 
 
-EncryptedServer::EncryptedServer()
+EncryptedServer::EncryptedServer(const IIdentityChecker& identityChecker)
+    : m_identityChecker(identityChecker)
 {
     connect(this, &QTcpServer::newConnection, this, &EncryptedServer::newConnection);
 }
