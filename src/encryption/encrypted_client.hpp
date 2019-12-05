@@ -32,11 +32,12 @@ struct IConnectionManager;
 class EncryptedClient
 {
     public:
-        EncryptedClient(IConnectionManager &);
+        EncryptedClient(const QSslKey& ourPublicKey, IConnectionManager &);
 
         void makeConnection(const QString& address, quint16 port);
 
     private:
+        QSslKey m_ourPublicKey;
         IConnectionManager& m_connectionManager;
 };
 

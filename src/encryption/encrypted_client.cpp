@@ -23,8 +23,10 @@
 #include "iconnection_manager.hpp"
 
 
-EncryptedClient::EncryptedClient(IConnectionManager& connection_manager)
-    : m_connectionManager(connection_manager)
+EncryptedClient::EncryptedClient(const QSslKey& ourPublicKey, IConnectionManager& connection_manager)
+    : m_ourPublicKey(m_ourPublicKey)
+    , m_connectionManager(connection_manager)
+
 {
 }
 
