@@ -44,7 +44,7 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         void socketError(QAbstractSocket::SocketError);
 
     signals:
-        void gotTheirsPublicKey();
+        void gotTheirsPublicKey(IEncryptedConnection *);
 };
 
 

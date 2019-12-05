@@ -53,7 +53,7 @@ void EncryptedServer::newConnection()
 }
 
 
-void EncryptedServer::validateTheirsPublicKey()
+void EncryptedServer::validateTheirsPublicKey(IEncryptedConnection* connection)
 {
 
 }
