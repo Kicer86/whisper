@@ -98,6 +98,18 @@ bool UserKeysManager::generateKeysPair() const
 }
 
 
+QSslKey UserKeysManager::ourPublicKey() const
+{
+    QFile publicKeyFile(publicKeyPath());
+    publicKeyFile.open(QFile::ReadOnly);
+
+    QSslKey key(&publicKeyFile, QSsl::Rsa, QSsl::Pem, QSsl::PublicKey);
+    assert(key.isNull() == false);
+
+    return key;
+}
+
+
 QString UserKeysManager::publicKeyPath() const
 {
     return QString("%1/%2").arg(m_keysDir).arg("rsa-public.pem");

@@ -19,6 +19,7 @@
 #define USERKEYSMANAGER_HPP
 
 #include <QString>
+#include <QSslKey>
 
 /**
  * @brief Class for managing user's cryptographic keys
@@ -31,6 +32,8 @@ class UserKeysManager
         bool privateKeyExists() const;
         bool publicKeyExists() const;
         bool generateKeysPair() const;
+
+        QSslKey ourPublicKey() const;
 
     private:
         const QString m_keysDir;
