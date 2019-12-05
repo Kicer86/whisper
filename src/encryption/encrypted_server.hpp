@@ -18,10 +18,12 @@
 #ifndef ENCRYPTEDSERVER_HPP
 #define ENCRYPTEDSERVER_HPP
 
+#include <memory>
 #include <QTcpServer>
 
 struct IConnectionManager;
 struct IIdentityChecker;
+struct IEncryptedConnection;
 
 /**
  * @brief Server providing encrypted connections
@@ -30,10 +32,12 @@ class EncryptedServer final: public QTcpServer
 {
     public:
         EncryptedServer(const IIdentityChecker &, IConnectionManager &);
+        ~EncryptedServer();
 
     private:
         const IIdentityChecker& m_identityChecker;
         IConnectionManager& m_connectionManager;
+        std::vector<std::unique_ptr<IEncryptedConnection>> m_waitingForApproval;
 
         void newConnection();
 };

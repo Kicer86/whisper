@@ -32,6 +32,12 @@ EncryptedServer::EncryptedServer(const IIdentityChecker& identityChecker, IConne
 }
 
 
+EncryptedServer::~EncryptedServer()
+{
+
+}
+
+
 void EncryptedServer::newConnection()
 {
     while(hasPendingConnections())
@@ -39,6 +45,6 @@ void EncryptedServer::newConnection()
         QTcpSocket* socket = nextPendingConnection();
 
         auto encrypted_connection = std::make_unique<EncryptedConnection>(socket);
-        m_connectionManager.add(std::move(encrypted_connection));
+        m_waitingForApproval.push_back(std::move(encrypted_connection));
     }
 }
