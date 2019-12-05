@@ -46,5 +46,14 @@ void EncryptedServer::newConnection()
 
         auto encrypted_connection = std::make_unique<EncryptedConnection>(socket);
         m_waitingForApproval.push_back(std::move(encrypted_connection));
+
+        EncryptedConnection* ec = encrypted_connection.get();
+        connect(ec, &EncryptedConnection::gotTheirsPublicKey, this, &EncryptedServer::validateTheirsPublicKey);
     }
+}
+
+
+void EncryptedServer::validateTheirsPublicKey()
+{
+
 }

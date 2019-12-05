@@ -29,14 +29,22 @@
 
 class EncryptedConnection: public QObject, public IEncryptedConnection
 {
+        Q_OBJECT
+
     public:
         EncryptedConnection(QTcpSocket* socket);
 
+        QSslKey getTheirsPublicKey() const override;
+
     private:
+        QSslKey m_theirsPublicKey;
         QTcpSocket* m_socket;
 
         void socketStateChanged(QAbstractSocket::SocketState socketState);
         void socketError(QAbstractSocket::SocketError);
+
+    signals:
+        void gotTheirsPublicKey();
 };
 
 

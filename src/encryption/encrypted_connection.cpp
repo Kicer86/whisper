@@ -28,6 +28,12 @@ EncryptedConnection::EncryptedConnection(QTcpSocket* socket):
 }
 
 
+QSslKey EncryptedConnection::getTheirsPublicKey() const
+{
+    return m_theirsPublicKey;
+}
+
+
 void EncryptedConnection::socketStateChanged(QAbstractSocket::SocketState socketState)
 {
     std::cout << "client socket state changed to: " << socketState << "\n";

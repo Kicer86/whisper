@@ -40,6 +40,7 @@ class EncryptedServer final: public QTcpServer
         std::vector<std::unique_ptr<IEncryptedConnection>> m_waitingForApproval;
 
         void newConnection();
+        void validateTheirsPublicKey();
 };
 
 #endif // ENCRYPTEDSERVER_HPP
