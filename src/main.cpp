@@ -8,6 +8,10 @@
 
 #include "main_window.hpp"
 #include "user_keys_manager.hpp"
+#include "server.hpp"
+#include "encryption/encrypted_client.hpp"
+#include "connection_manager.hpp"
+
 
 int main(int argc, char** argv)
 {
@@ -32,8 +36,22 @@ int main(int argc, char** argv)
 
     UserKeysManager manager(configDir + "/user_keys");
 
+    /// @todo handle this one properly (like as user what to do when one file is missing
     if (manager.privateKeyExists() == false || manager.publicKeyExists() == false)
         manager.generateKeysPair();
+
+    /// @todo validate keys
+
+    ConnectionManager connectionManager;
+
+    const QSslKey oursPublicKey = manager.ourPublicKey();
+    Server server(oursPublicKey, connectionManager, configuration.getEntry("port").toInt());
+    server.start();
+
+    // temporary debug code
+    EncryptedClient client(oursPublicKey, connectionManager);
+    if (configuration.getEntry("port").toInt() != 1234)
+        client.makeConnection("localhost", 1234);
 
     MainWindow main_window;
     main_window.show();

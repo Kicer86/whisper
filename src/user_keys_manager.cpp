@@ -84,7 +84,7 @@ bool UserKeysManager::generateKeysPair() const
         check_ssl_status( RSA_generate_key_ex(rsa.get(), bits, bn.get(), nullptr) );
 
         BIO_FILE_ptr pem_pub(BIO_new_file(public_key_path.toStdString().c_str(), "w"), ::BIO_free);
-        check_ssl_status( PEM_write_bio_RSAPublicKey(pem_pub.get(), rsa.get()) );
+        check_ssl_status( PEM_write_bio_RSA_PUBKEY(pem_pub.get(), rsa.get()) );
 
         BIO_FILE_ptr pem_prv(BIO_new_file(private_key_path.toStdString().c_str(), "w"), ::BIO_free);
         check_ssl_status( PEM_write_bio_RSAPrivateKey(pem_prv.get(), rsa.get(), NULL, NULL, 0, NULL, NULL) );
@@ -95,6 +95,18 @@ bool UserKeysManager::generateKeysPair() const
     }
 
     return status;
+}
+
+
+QSslKey UserKeysManager::ourPublicKey() const
+{
+    QFile publicKeyFile(publicKeyPath());
+    publicKeyFile.open(QFile::ReadOnly);
+
+    QSslKey key(&publicKeyFile, QSsl::Rsa, QSsl::Pem, QSsl::PublicKey);
+    assert(key.isNull() == false);
+
+    return key;
 }
 
 

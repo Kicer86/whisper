@@ -1,6 +1,5 @@
 /*
- * Utility for connections management
- * Copyright (C) 2018  Michał Walenciak <Kicer86@gmail.com>
+ * Copyright (C) 2019  Michał Walenciak <Kicer86@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,18 +17,7 @@
 
 #include "connection_manager.hpp"
 
-#include "client.hpp"
-#include "server.hpp"
-
-
-ConnectionManager::ConnectionManager(IUserManager* userMgr):
-    QObject(),
-    m_userManager(userMgr)
+void ConnectionManager::add(std::unique_ptr<IEncryptedConnection> connection)
 {
-}
-
-
-ConnectionManager::~ConnectionManager()
-{
-
+    m_connections.emplace_back(std::move(connection));
 }

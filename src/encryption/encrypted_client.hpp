@@ -15,24 +15,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONNECTIONMANAGER_HPP
-#define CONNECTIONMANAGER_HPP
+#ifndef ENCRYPTEDCLIENT_HPP
+#define ENCRYPTEDCLIENT_HPP
 
-#include <deque>
+#include <memory>
+#include <QString>
 
-#include "encryption/iconnection_manager.hpp"
-#include "encryption/iencrypted_connection.hpp"
+#include "iencrypted_connection.hpp"
+
+class QTcpSocket;
+struct IConnectionManager;
+
 
 /**
- * @brief class for managing connections
+ * @brief tool for making connections
  */
-class ConnectionManager : public IConnectionManager
+class EncryptedClient
 {
     public:
-        void add(std::unique_ptr<IEncryptedConnection>) override;
+        EncryptedClient(const QSslKey& ourPublicKey, IConnectionManager &);
+
+        void makeConnection(const QString& address, quint16 port);
 
     private:
-        std::deque<std::unique_ptr<IEncryptedConnection>> m_connections;
+        const QSslKey m_ourPublicKey;
+        IConnectionManager& m_connectionManager;
+
+        void sendPublicKey(QTcpSocket &);
 };
 
-#endif // CONNECTIONMANAGER_HPP
+#endif // ENCRYPTEDCLIENT_HPP

@@ -15,24 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONNECTIONMANAGER_HPP
-#define CONNECTIONMANAGER_HPP
+#ifndef IDENTITY_HPP
+#define IDENTITY_HPP
 
-#include <deque>
-
-#include "encryption/iconnection_manager.hpp"
-#include "encryption/iencrypted_connection.hpp"
+#include <QSslKey>
 
 /**
- * @brief class for managing connections
+ * @brief Identity details
  */
-class ConnectionManager : public IConnectionManager
+class Identity
 {
     public:
-        void add(std::unique_ptr<IEncryptedConnection>) override;
+        Identity(const QSslKey& public_key);
 
     private:
-        std::deque<std::unique_ptr<IEncryptedConnection>> m_connections;
+        QSslKey m_publicKey;
 };
 
-#endif // CONNECTIONMANAGER_HPP
+#endif // IDENTITY_HPP

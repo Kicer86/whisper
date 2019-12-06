@@ -21,20 +21,23 @@
 
 #include <QObject>
 
-class QTcpServer;
+#include "encryption/encrypted_server.hpp"
+#include "identity_checker.hpp"
 
 class Server final: public QObject
 {
         Q_OBJECT
 
     public:
-        Server(QObject * = nullptr);
+        Server(const QSslKey& oursPublicKey, IConnectionManager& connection_manager, quint16 port, QObject * = nullptr);
         ~Server();
 
         void start();
 
     private:
-        QTcpServer* m_server;
+        IdentityChecker m_identityChecker;
+        EncryptedServer m_server;
+        quint16 m_port;
 };
 
 #endif // SERVER_HPP

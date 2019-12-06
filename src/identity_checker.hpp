@@ -15,24 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONNECTIONMANAGER_HPP
-#define CONNECTIONMANAGER_HPP
+#ifndef IDENTITYCHECKER_HPP
+#define IDENTITYCHECKER_HPP
 
-#include <deque>
-
-#include "encryption/iconnection_manager.hpp"
-#include "encryption/iencrypted_connection.hpp"
+#include "encryption/iidentity_checker.hpp"
 
 /**
- * @brief class for managing connections
+ * @brief tool for validating identities
  */
-class ConnectionManager : public IConnectionManager
+class IdentityChecker : public IIdentityChecker
 {
     public:
-        void add(std::unique_ptr<IEncryptedConnection>) override;
-
-    private:
-        std::deque<std::unique_ptr<IEncryptedConnection>> m_connections;
+        bool isValid(const Identity &) const override;
 };
 
-#endif // CONNECTIONMANAGER_HPP
+#endif // IDENTITYCHECKER_HPP

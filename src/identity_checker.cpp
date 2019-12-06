@@ -1,6 +1,5 @@
 /*
- * Client - low level utility for establishing connections with others.
- * Copyright (C) 2018  Michał Walenciak <Kicer86@gmail.com>
+ * Copyright (C) 2019  Michał Walenciak <Kicer86@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,4 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "client.hpp"
+#include "identity_checker.hpp"
+
+
+bool IdentityChecker::isValid(const Identity&) const
+{
+    return true;
+}

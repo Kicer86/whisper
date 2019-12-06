@@ -21,23 +21,27 @@
 #include <cassert>
 #include <QTcpServer>
 
+#include "encryption/iidentity_checker.hpp"
 
-Server::Server(QObject* p):
+
+Server::Server(const QSslKey& oursPublicKey, IConnectionManager& connection_manager, quint16 port, QObject* p):
     QObject(p),
-    m_server(new QTcpServer)
+    m_identityChecker(),
+    m_server(oursPublicKey, m_identityChecker, connection_manager),
+    m_port(port)
 {
 }
 
 
 Server::~Server()
 {
-    m_server->close();
+    m_server.close();
 }
 
 
 void Server::start()
 {
-    const bool status = m_server->listen(QHostAddress::Any, 1234);
+    const bool status = m_server.listen(QHostAddress::Any, m_port);
 
     assert(status);
 }

@@ -15,31 +15,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef USERKEYSMANAGER_HPP
-#define USERKEYSMANAGER_HPP
+#ifndef ENCRYPTEDSERVER_HPP
+#define ENCRYPTEDSERVER_HPP
 
-#include <QString>
+#include <memory>
+#include <QTcpServer>
 #include <QSslKey>
 
+struct IConnectionManager;
+struct IIdentityChecker;
+struct IEncryptedConnection;
+
 /**
- * @brief Class for managing user's cryptographic keys
+ * @brief Server providing encrypted connections
  */
-class UserKeysManager
+class EncryptedServer final: public QTcpServer
 {
     public:
-        UserKeysManager(const QString& keys_dir);
-
-        bool privateKeyExists() const;
-        bool publicKeyExists() const;
-        bool generateKeysPair() const;
-
-        QSslKey ourPublicKey() const;
+        EncryptedServer(const QSslKey& oursPublicKey, const IIdentityChecker &, IConnectionManager &);
+        ~EncryptedServer();
 
     private:
-        const QString m_keysDir;
+        const QSslKey m_oursPublicKey;
+        const IIdentityChecker& m_identityChecker;
+        IConnectionManager& m_connectionManager;
+        std::vector<std::unique_ptr<IEncryptedConnection>> m_waitingForApproval;
 
-        QString privateKeyPath() const;
-        QString publicKeyPath() const;
+        void newConnection();
+        void validateTheirsPublicKey(IEncryptedConnection *);
 };
 
-#endif // USERKEYSMANAGER_HPP
+#endif // ENCRYPTEDSERVER_HPP
