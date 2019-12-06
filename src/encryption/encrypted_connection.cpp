@@ -22,7 +22,7 @@
 EncryptedConnection::EncryptedConnection(const QSslKey& oursPublicKey, const QString& host, quint16 port)
     : m_oursPublicKey(oursPublicKey)
     , m_socket(std::make_unique<QTcpSocket>())
-    , m_state(WaitForTheirsPublicKey)
+    , m_state(WaitForConnectionValidation)
 {
     connectToSocketSignals();
 
@@ -36,7 +36,7 @@ EncryptedConnection::EncryptedConnection(const QSslKey& oursPublicKey, const QSt
 EncryptedConnection::EncryptedConnection(const QSslKey& oursPublicKey, QTcpSocket* socket)
     : m_oursPublicKey(oursPublicKey)
     , m_socket(socket)
-    , m_state(WaitForTheirsPublicKey)
+    , m_state(ValidateIncomingConnection)
 {
     connectToSocketSignals();
 }
@@ -128,11 +128,35 @@ void EncryptedConnection::readyRead()
 {
     switch (m_state)
     {
-        case WaitForTheirsPublicKey:
+        // server side only
+        case ValidateIncomingConnection:
         {
             const bool success = readTheirsPublicKey();
+
+            /// @todo: validate connection
             if (success)
+            {
+                sendPublicKey();
                 m_state = ConnectionEstablished;
+
+                std::cout << "client accepted\n";
+            }
+
+            break;
+        }
+
+        // client side only
+        case WaitForConnectionValidation:
+        {
+            const bool success = readTheirsPublicKey();
+
+            /// @todo: validate connection
+            if (success)
+            {
+                m_state = ConnectionEstablished;
+
+                std::cout << "accepted by server\n";
+            }
 
             break;
         }
