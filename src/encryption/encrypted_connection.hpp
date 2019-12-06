@@ -52,6 +52,8 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         void connectToSocketSignals();
         void sendPublicKey();
 
+        bool readTheirsPublicKey();
+
         void socketStateChanged(QAbstractSocket::SocketState socketState);
         void socketError(QAbstractSocket::SocketError);
         void readyRead();

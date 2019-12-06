@@ -77,6 +77,41 @@ void EncryptedConnection::sendPublicKey()
 }
 
 
+bool EncryptedConnection::readTheirsPublicKey()
+{
+    if (m_socket->bytesAvailable() < 2)
+        return false;
+
+    union
+    {
+        char signedBytes[2];
+        quint16 size;
+    } sizeTranslator;
+
+    m_socket->getChar(&sizeTranslator.signedBytes[0]);
+    m_socket->getChar(&sizeTranslator.signedBytes[1]);
+
+    const int size = sizeTranslator.size;
+
+    if (m_socket->bytesAvailable() < size)
+    {
+        m_socket->ungetChar(sizeTranslator.signedBytes[1]);
+        m_socket->ungetChar(sizeTranslator.signedBytes[0]);
+
+        return false;
+    }
+    else
+    {
+        assert(m_theirsPublicKey.isNull());
+        const QByteArray theirsPublicKey = m_socket->read(size);
+
+        m_theirsPublicKey = QSslKey(theirsPublicKey, QSsl::Rsa, QSsl::Pem, QSsl::PublicKey);
+
+        return true;
+    }
+}
+
+
 void EncryptedConnection::socketStateChanged(QAbstractSocket::SocketState socketState)
 {
     std::cout << "client socket state changed to: " << socketState << "\n";
@@ -91,39 +126,13 @@ void EncryptedConnection::socketError(QAbstractSocket::SocketError)
 
 void EncryptedConnection::readyRead()
 {
-    /// @todo: extract
     switch (m_state)
     {
         case WaitForTheirsPublicKey:
         {
-            if (m_socket->bytesAvailable() < 2)
-                break;
-
-            union
-            {
-                char signedBytes[2];
-                quint16 size;
-            } sizeTranslator;
-
-            m_socket->getChar(&sizeTranslator.signedBytes[0]);
-            m_socket->getChar(&sizeTranslator.signedBytes[1]);
-
-            const int size = sizeTranslator.size;
-
-            if (m_socket->bytesAvailable() < size)
-            {
-                m_socket->ungetChar(sizeTranslator.signedBytes[1]);
-                m_socket->ungetChar(sizeTranslator.signedBytes[0]);
-            }
-            else
-            {
-                assert(m_theirsPublicKey.isNull());
-                const QByteArray theirsPublicKey = m_socket->read(size);
-
-                m_theirsPublicKey = QSslKey(theirsPublicKey, QSsl::Rsa, QSsl::Pem, QSsl::PublicKey);
-
+            const bool success = readTheirsPublicKey();
+            if (success)
                 m_state = ConnectionEstablished;
-            }
 
             break;
         }
