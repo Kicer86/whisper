@@ -38,6 +38,26 @@ void EncryptedClient::makeConnection(const QString& address, quint16 port)
     socket->connectToHost(address, port);
 
     auto encryptedConnection = std::make_unique<EncryptedConnection>(socket);
+    sendPublicKey(*socket);
 
     m_connectionManager.add(std::move(encryptedConnection));
+}
+
+
+void EncryptedClient::sendPublicKey(QTcpSocket& socket)
+{
+    const QByteArray keyByteArray = m_ourPublicKey.toPem();
+    const int keyByteArraySize = keyByteArray.size();
+    assert(keyByteArraySize < 65536);
+
+    union
+    {
+        quint16 publicKeySize;
+        char publicKeySizeRaw[2];
+    } publicKeyUnion;
+
+    publicKeyUnion.publicKeySize = keyByteArraySize;
+
+    socket.write(publicKeyUnion.publicKeySizeRaw, 2);
+    socket.write(keyByteArray);
 }

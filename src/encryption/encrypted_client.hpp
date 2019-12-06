@@ -23,6 +23,7 @@
 
 #include "iencrypted_connection.hpp"
 
+class QTcpSocket;
 struct IConnectionManager;
 
 
@@ -39,6 +40,8 @@ class EncryptedClient
     private:
         QSslKey m_ourPublicKey;
         IConnectionManager& m_connectionManager;
+
+        void sendPublicKey(QTcpSocket &);
 };
 
 #endif // ENCRYPTEDCLIENT_HPP
