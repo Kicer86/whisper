@@ -40,8 +40,15 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         QSslKey m_theirsPublicKey;
         QTcpSocket* m_socket;
 
+        enum State
+        {
+            WaitForTheirsPublicKey,
+            ConnectionEstablished,
+        } m_state;
+
         void socketStateChanged(QAbstractSocket::SocketState socketState);
         void socketError(QAbstractSocket::SocketError);
+        void readyRead();
 
     signals:
         void gotTheirsPublicKey(IEncryptedConnection *);

@@ -20,11 +20,13 @@
 #include <iostream>
 
 
-EncryptedConnection::EncryptedConnection(QTcpSocket* socket):
-    m_socket(socket)
+EncryptedConnection::EncryptedConnection(QTcpSocket* socket)
+    : m_socket(socket)
+    , m_state(WaitForTheirsPublicKey)
 {
     connect(m_socket, &QTcpSocket::stateChanged, this, &EncryptedConnection::socketStateChanged);
     connect(m_socket, qOverload<QAbstractSocket::SocketError>(&QTcpSocket::error), this, &EncryptedConnection::socketError);
+    connect(m_socket, &QTcpSocket::readyRead, this, &EncryptedConnection::readyRead);
 }
 
 
@@ -43,4 +45,50 @@ void EncryptedConnection::socketStateChanged(QAbstractSocket::SocketState socket
 void EncryptedConnection::socketError(QAbstractSocket::SocketError)
 {
     std::cout << "client socket error: " << m_socket->errorString().toStdString() << "\n";
+}
+
+
+void EncryptedConnection::readyRead()
+{
+    switch (m_state)
+    {
+        case WaitForTheirsPublicKey:
+        {
+            if (m_socket->bytesAvailable() < 2)
+                break;
+
+            union
+            {
+                char signedBytes[2];
+                quint16 size;
+            } sizeTranslator;
+
+            m_socket->getChar(&sizeTranslator.signedBytes[0]);
+            m_socket->getChar(&sizeTranslator.signedBytes[1]);
+
+            const int size = sizeTranslator.size;
+
+            if (m_socket->bytesAvailable() < size)
+            {
+                m_socket->ungetChar(sizeTranslator.signedBytes[1]);
+                m_socket->ungetChar(sizeTranslator.signedBytes[0]);
+            }
+            else
+            {
+                assert(m_theirsPublicKey.isNull());
+                const QByteArray theirsPublicKey = m_socket->read(size);
+
+                m_theirsPublicKey = QSslKey(theirsPublicKey, QSsl::Rsa, QSsl::Pem, QSsl::PublicKey);
+
+                m_state = ConnectionEstablished;
+            }
+
+            break;
+        }
+
+        case ConnectionEstablished:
+        {
+            break;
+        }
+    }
 }
