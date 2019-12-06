@@ -50,6 +50,7 @@ void EncryptedConnection::socketError(QAbstractSocket::SocketError)
 
 void EncryptedConnection::readyRead()
 {
+    /// @todo: extract
     switch (m_state)
     {
         case WaitForTheirsPublicKey:
