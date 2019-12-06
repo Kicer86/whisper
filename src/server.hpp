@@ -29,7 +29,7 @@ class Server final: public QObject
         Q_OBJECT
 
     public:
-        Server(IConnectionManager& connection_manager, quint16 port, QObject * = nullptr);
+        Server(const QSslKey& oursPublicKey, IConnectionManager& connection_manager, quint16 port, QObject * = nullptr);
         ~Server();
 
         void start();

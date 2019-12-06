@@ -38,7 +38,7 @@ class EncryptedClient
         void makeConnection(const QString& address, quint16 port);
 
     private:
-        QSslKey m_ourPublicKey;
+        const QSslKey m_ourPublicKey;
         IConnectionManager& m_connectionManager;
 
         void sendPublicKey(QTcpSocket &);

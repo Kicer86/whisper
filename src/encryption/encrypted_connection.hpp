@@ -21,6 +21,7 @@
 
 #include "iencrypted_connection.hpp"
 
+#include <memory>
 #include <QTcpSocket>
 
 /**
@@ -32,19 +33,24 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         Q_OBJECT
 
     public:
-        EncryptedConnection(QTcpSocket* socket);
+        EncryptedConnection(const QSslKey& oursPublicKey, const QString& host, quint16 port);
+        EncryptedConnection(const QSslKey& oursPublicKey, QTcpSocket *);
 
         QSslKey getTheirsPublicKey() const override;
 
     private:
+        QSslKey m_oursPublicKey;
         QSslKey m_theirsPublicKey;
-        QTcpSocket* m_socket;
+        std::unique_ptr<QTcpSocket> m_socket;
 
         enum State
         {
             WaitForTheirsPublicKey,
             ConnectionEstablished,
         } m_state;
+
+        void connectToSocketSignals();
+        void sendPublicKey();
 
         void socketStateChanged(QAbstractSocket::SocketState socketState);
         void socketError(QAbstractSocket::SocketError);

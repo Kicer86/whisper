@@ -20,6 +20,7 @@
 
 #include <memory>
 #include <QTcpServer>
+#include <QSslKey>
 
 struct IConnectionManager;
 struct IIdentityChecker;
@@ -31,10 +32,11 @@ struct IEncryptedConnection;
 class EncryptedServer final: public QTcpServer
 {
     public:
-        EncryptedServer(const IIdentityChecker &, IConnectionManager &);
+        EncryptedServer(const QSslKey& oursPublicKey, const IIdentityChecker &, IConnectionManager &);
         ~EncryptedServer();
 
     private:
+        const QSslKey m_oursPublicKey;
         const IIdentityChecker& m_identityChecker;
         IConnectionManager& m_connectionManager;
         std::vector<std::unique_ptr<IEncryptedConnection>> m_waitingForApproval;

@@ -24,9 +24,8 @@
 
 
 EncryptedClient::EncryptedClient(const QSslKey& ourPublicKey, IConnectionManager& connection_manager)
-    : m_ourPublicKey(m_ourPublicKey)
+    : m_ourPublicKey(ourPublicKey)
     , m_connectionManager(connection_manager)
-
 {
     /// @todo do no work with invalid public key
 }
@@ -34,30 +33,10 @@ EncryptedClient::EncryptedClient(const QSslKey& ourPublicKey, IConnectionManager
 
 void EncryptedClient::makeConnection(const QString& address, quint16 port)
 {
-    QTcpSocket* socket = new QTcpSocket;
-    socket->connectToHost(address, port);
-
-    auto encryptedConnection = std::make_unique<EncryptedConnection>(socket);
-    sendPublicKey(*socket);
+    auto encryptedConnection = std::make_unique<EncryptedConnection>(m_ourPublicKey, address, port);
 
     m_connectionManager.add(std::move(encryptedConnection));
 }
 
 
-void EncryptedClient::sendPublicKey(QTcpSocket& socket)
-{
-    const QByteArray keyByteArray = m_ourPublicKey.toPem();
-    const int keyByteArraySize = keyByteArray.size();
-    assert(keyByteArraySize < 65536);
 
-    union
-    {
-        quint16 publicKeySize;
-        char publicKeySizeRaw[2];
-    } publicKeyUnion;
-
-    publicKeyUnion.publicKeySize = keyByteArraySize;
-
-    socket.write(publicKeyUnion.publicKeySizeRaw, 2);
-    socket.write(keyByteArray);
-}
