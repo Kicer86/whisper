@@ -28,6 +28,7 @@ EncryptedClient::EncryptedClient(const QSslKey& ourPublicKey, IConnectionManager
     , m_connectionManager(connection_manager)
 
 {
+    /// @todo do no work with invalid public key
 }
 
 

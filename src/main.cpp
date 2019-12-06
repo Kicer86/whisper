@@ -36,8 +36,11 @@ int main(int argc, char** argv)
 
     UserKeysManager manager(configDir + "/user_keys");
 
+    /// @todo handle this one properly (like as user what to do when one file is missing
     if (manager.privateKeyExists() == false || manager.publicKeyExists() == false)
         manager.generateKeysPair();
+
+    /// @todo validate keys
 
     ConnectionManager connectionManager;
 
