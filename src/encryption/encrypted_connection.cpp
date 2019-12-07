@@ -76,10 +76,10 @@ void EncryptedConnection::sendPublicKey()
 }
 
 
-bool EncryptedConnection::readTheirsPublicKey()
+void EncryptedConnection::readTheirsPublicKey()
 {
     if (m_socket->bytesAvailable() < 2)
-        return false;
+        throw not_enouth_data{};
 
     union
     {
@@ -94,10 +94,11 @@ bool EncryptedConnection::readTheirsPublicKey()
 
     if (m_socket->bytesAvailable() < size)
     {
+        // undo any reads - wait for more
         m_socket->ungetChar(sizeTranslator.signedBytes[1]);
         m_socket->ungetChar(sizeTranslator.signedBytes[0]);
 
-        return false;
+        throw not_enouth_data{};
     }
     else
     {
@@ -105,8 +106,6 @@ bool EncryptedConnection::readTheirsPublicKey()
         const QByteArray theirsPublicKey = m_socket->read(size);
 
         m_theirsPublicKey = QSslKey(theirsPublicKey, QSsl::Rsa, QSsl::Pem, QSsl::PublicKey);
-
-        return true;
     }
 }
 
@@ -125,44 +124,43 @@ void EncryptedConnection::socketError(QAbstractSocket::SocketError)
 
 void EncryptedConnection::readyRead()
 {
-    switch (m_state)
+    try
     {
-        // server side only
-        case ValidateIncomingConnection:
-        {
-            const bool success = readTheirsPublicKey();
-
-            /// @todo: validate connection
-            if (success)
+        while (m_socket->bytesAvailable())
+            switch (m_state)
             {
-                sendPublicKey();
-                m_state = ConnectionEstablished;
+                // server side only
+                case ValidateIncomingConnection:
+                {
+                    readTheirsPublicKey();
 
-                std::cout << "client accepted\n";
+                    /// @todo: validate connection
+                    sendPublicKey();
+                    m_state = ConnectionEstablished;
+
+                    std::cout << "client accepted\n";
+                    break;
+                }
+
+                // client side only
+                case WaitForConnectionValidation:
+                {
+                    readTheirsPublicKey();
+
+                    /// @todo: validate connection
+                    m_state = ConnectionEstablished;
+
+                    std::cout << "accepted by server\n";
+                    break;
+                }
+
+                case ConnectionEstablished:
+                {
+                    throw unexpected_data{};
+                    break;
+                }
             }
-
-            break;
-        }
-
-        // client side only
-        case WaitForConnectionValidation:
-        {
-            const bool success = readTheirsPublicKey();
-
-            /// @todo: validate connection
-            if (success)
-            {
-                m_state = ConnectionEstablished;
-
-                std::cout << "accepted by server\n";
-            }
-
-            break;
-        }
-
-        case ConnectionEstablished:
-        {
-            break;
-        }
     }
+    catch(const not_enouth_data &) {}       /// this is not failure, wait for more
+    catch(const unexpected_data &) {}       /// some error in protocol, @todo kill connection
 }
