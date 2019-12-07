@@ -18,11 +18,13 @@
 #include "user_keys_manager.hpp"
 
 #include <memory>
-#include <openssl/rsa.h>
-#include <openssl/x509.h>
-#include <openssl/pem.h>
-#include <openssl/bn.h>
+#include <botan/pkcs8.h>
+#include <botan/rsa.h>
+#include <botan/system_rng.h>
+#include <botan/auto_rng.h>
+#include <botan/x509_key.h>
 #include <QDir>
+#include <QFile>
 
 // https://stackoverflow.com/a/13635912/1749713  related knowledge
 
@@ -30,15 +32,10 @@ namespace
 {
     constexpr int bits = 4096;
 
-    using BN_ptr = std::unique_ptr<BIGNUM, decltype(&::BN_free)>;
-    using RSA_ptr = std::unique_ptr<RSA, decltype(&::RSA_free)>;
-    using EVP_KEY_ptr = std::unique_ptr<EVP_PKEY, decltype(&::EVP_PKEY_free)>;
-    using BIO_FILE_ptr = std::unique_ptr<BIO, decltype(&::BIO_free)>;
-
     void check_ssl_status(int status)
     {
         if (status != 1)
-            throw std::runtime_error("OpenSSL error");
+            throw std::runtime_error("Botan error");
     }
 }
 
@@ -77,17 +74,25 @@ bool UserKeysManager::generateKeysPair() const
         const QString private_key_path = privateKeyPath();
         const QString public_key_path = publicKeyPath();
 
-        BN_ptr bn(BN_new(), ::BN_free);
-        check_ssl_status( BN_set_word(bn.get(), RSA_F4) );
+        std::unique_ptr<Botan::RandomNumberGenerator> rng;
+        #if defined(BOTAN_HAS_SYSTEM_RNG)
+        rng.reset(new Botan::System_RNG);
+        #else
+        rng.reset(new Botan::AutoSeeded_RNG);
+        #endif
 
-        RSA_ptr rsa(RSA_new(), ::RSA_free);
-        check_ssl_status( RSA_generate_key_ex(rsa.get(), bits, bn.get(), nullptr) );
+        Botan::RSA_PrivateKey key_pair(*rng.get(), bits);
 
-        BIO_FILE_ptr pem_pub(BIO_new_file(public_key_path.toStdString().c_str(), "w"), ::BIO_free);
-        check_ssl_status( PEM_write_bio_RSA_PUBKEY(pem_pub.get(), rsa.get()) );
+        std::string public_key = Botan::X509::PEM_encode(key_pair);
+        std::string private_key = Botan::PKCS8::PEM_encode(key_pair);
 
-        BIO_FILE_ptr pem_prv(BIO_new_file(private_key_path.toStdString().c_str(), "w"), ::BIO_free);
-        check_ssl_status( PEM_write_bio_RSAPrivateKey(pem_prv.get(), rsa.get(), NULL, NULL, 0, NULL, NULL) );
+        QFile public_key_file(publicKeyPath());
+        public_key_file.open(QFile::WriteOnly);
+        public_key_file.write(public_key.c_str());
+
+        QFile private_key_file(privateKeyPath());
+        private_key_file.open(QFile::WriteOnly);
+        private_key_file.write(private_key.c_str());
     }
     catch(const std::runtime_error &)
     {
@@ -98,15 +103,11 @@ bool UserKeysManager::generateKeysPair() const
 }
 
 
-QSslKey UserKeysManager::ourPublicKey() const
+std::unique_ptr<Botan::Public_Key> UserKeysManager::ourPublicKey() const
 {
-    QFile publicKeyFile(publicKeyPath());
-    publicKeyFile.open(QFile::ReadOnly);
+    std::unique_ptr<Botan::Public_Key> public_key( Botan::X509::load_key(publicKeyPath().toStdString()) );
 
-    QSslKey key(&publicKeyFile, QSsl::Rsa, QSsl::Pem, QSsl::PublicKey);
-    assert(key.isNull() == false);
-
-    return key;
+    return public_key;
 }
 
 

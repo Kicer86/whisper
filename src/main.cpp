@@ -44,12 +44,12 @@ int main(int argc, char** argv)
 
     ConnectionManager connectionManager;
 
-    const QSslKey oursPublicKey = manager.ourPublicKey();
-    Server server(oursPublicKey, connectionManager, configuration.getEntry("port").toInt());
+    auto oursPublicKey = manager.ourPublicKey();
+    Server server(oursPublicKey.get(), connectionManager, configuration.getEntry("port").toInt());
     server.start();
 
     // temporary debug code
-    EncryptedClient client(oursPublicKey, connectionManager);
+    EncryptedClient client(oursPublicKey.get(), connectionManager);
     if (configuration.getEntry("port").toInt() != 1234)
         client.makeConnection("localhost", 1234);
 

@@ -18,12 +18,13 @@
 #include "encrypted_connection.hpp"
 
 #include <iostream>
-#include <openssl/rand.h>
+#include <botan/data_src.h>
+#include <botan/x509_key.h>
 
 #include "utils.hpp"
 
 
-EncryptedConnection::EncryptedConnection(const QSslKey& oursPublicKey, const QString& host, quint16 port)
+EncryptedConnection::EncryptedConnection(const Botan::Public_Key* oursPublicKey, const QString& host, quint16 port)
     : m_oursPublicKey(oursPublicKey)
     , m_socket(new QTcpSocket(this))
     , m_state(WaitForConnectionValidation)
@@ -37,7 +38,7 @@ EncryptedConnection::EncryptedConnection(const QSslKey& oursPublicKey, const QSt
 
 
 
-EncryptedConnection::EncryptedConnection(const QSslKey& oursPublicKey, QTcpSocket* socket)
+EncryptedConnection::EncryptedConnection(const Botan::Public_Key* oursPublicKey, QTcpSocket* socket)
     : m_oursPublicKey(oursPublicKey)
     , m_socket(socket)
     , m_state(ValidateIncomingConnection)
@@ -47,9 +48,9 @@ EncryptedConnection::EncryptedConnection(const QSslKey& oursPublicKey, QTcpSocke
 }
 
 
-QSslKey EncryptedConnection::getTheirsPublicKey() const
+const Botan::Public_Key* EncryptedConnection::getTheirsPublicKey() const
 {
-    return m_theirsPublicKey;
+    return m_theirsPublicKey.get();
 }
 
 
@@ -63,7 +64,7 @@ void EncryptedConnection::connectToSocketSignals()
 
 void EncryptedConnection::sendPublicKey()
 {
-    const QByteArray keyByteArray = m_oursPublicKey.toPem();
+    const QByteArray keyByteArray = Botan::X509::PEM_encode(*m_oursPublicKey).c_str();
     const int keyByteArraySize = keyByteArray.size();
     assert(keyByteArraySize < 65536);
 
@@ -79,7 +80,7 @@ void EncryptedConnection::sendPublicKey()
 
 void EncryptedConnection::sendSymmetricKey()
 {
-    RAND_bytes(m_symmetricKey.data(), m_symmetricKeySize);
+//    RAND_bytes(m_symmetricKey.data(), m_symmetricKeySize);
 
 }
 
@@ -108,10 +109,12 @@ void EncryptedConnection::readTheirsPublicKey()
     }
     else
     {
-        assert(m_theirsPublicKey.isNull());
-        const QByteArray theirsPublicKey = m_socket->read(size);
+        assert(m_theirsPublicKey.get() == nullptr);
+        QByteArray theirsPublicKey = m_socket->read(size);
 
-        m_theirsPublicKey = QSslKey(theirsPublicKey, QSsl::Rsa, QSsl::Pem, QSsl::PublicKey);
+        Botan::DataSource_Memory publicKeyDS(theirsPublicKey.toStdString());
+
+        m_theirsPublicKey.reset(Botan::X509::load_key(publicKeyDS));
     }
 }
 

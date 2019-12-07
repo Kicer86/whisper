@@ -32,14 +32,14 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         Q_OBJECT
 
     public:
-        EncryptedConnection(const QSslKey& oursPublicKey, const QString& host, quint16 port);
-        EncryptedConnection(const QSslKey& oursPublicKey, QTcpSocket *);
+        EncryptedConnection(const Botan::Public_Key* oursPublicKey, const QString& host, quint16 port);
+        EncryptedConnection(const Botan::Public_Key* oursPublicKey, QTcpSocket *);
 
-        QSslKey getTheirsPublicKey() const override;
+        const Botan::Public_Key* getTheirsPublicKey() const override;
 
     private:
-        QSslKey m_oursPublicKey;
-        QSslKey m_theirsPublicKey;
+        const Botan::Public_Key* m_oursPublicKey;
+        std::unique_ptr<Botan::Public_Key> m_theirsPublicKey;
         static constexpr int m_symmetricKeySize = 32;
         std::array<unsigned char, m_symmetricKeySize> m_symmetricKey;
         QTcpSocket* m_socket;

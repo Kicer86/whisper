@@ -23,7 +23,7 @@
 #include "iconnection_manager.hpp"
 
 
-EncryptedClient::EncryptedClient(const QSslKey& ourPublicKey, IConnectionManager& connection_manager)
+EncryptedClient::EncryptedClient(const Botan::Public_Key* ourPublicKey, IConnectionManager& connection_manager)
     : m_ourPublicKey(ourPublicKey)
     , m_connectionManager(connection_manager)
 {

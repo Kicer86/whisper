@@ -24,7 +24,7 @@
 #include "iconnection_manager.hpp"
 
 
-EncryptedServer::EncryptedServer(const QSslKey& oursPublicKey, const IIdentityChecker& identityChecker, IConnectionManager& connection_manager)
+EncryptedServer::EncryptedServer(const Botan::Public_Key* oursPublicKey, const IIdentityChecker& identityChecker, IConnectionManager& connection_manager)
     : m_oursPublicKey(oursPublicKey)
     , m_identityChecker(identityChecker)
     , m_connectionManager(m_connectionManager)
