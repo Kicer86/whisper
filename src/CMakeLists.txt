@@ -16,6 +16,7 @@ add_executable(whisper
                 encryption/identity.hpp
                 encryption/iencrypted_connection.hpp
                 encryption/iidentity_checker.hpp
+                encryption/utils.hpp
                 connection_manager.cpp
                 connection_manager.hpp
                 identity_checker.cpp
