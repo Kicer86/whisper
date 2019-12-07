@@ -21,7 +21,6 @@
 
 #include "iencrypted_connection.hpp"
 
-#include <memory>
 #include <QTcpSocket>
 
 /**
@@ -41,7 +40,7 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
     private:
         QSslKey m_oursPublicKey;
         QSslKey m_theirsPublicKey;
-        std::unique_ptr<QTcpSocket> m_socket;
+        QTcpSocket* m_socket;
 
         enum State
         {

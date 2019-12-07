@@ -44,7 +44,6 @@ void EncryptedServer::newConnection()
     while(hasPendingConnections())
     {
         QTcpSocket* socket = nextPendingConnection();
-        socket->setParent(nullptr);                     // EncryptedConnection will take it
 
         auto encrypted_connection = std::make_unique<EncryptedConnection>(m_oursPublicKey, socket);
         m_waitingForApproval.push_back(std::move(encrypted_connection));

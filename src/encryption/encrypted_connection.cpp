@@ -21,7 +21,7 @@
 
 EncryptedConnection::EncryptedConnection(const QSslKey& oursPublicKey, const QString& host, quint16 port)
     : m_oursPublicKey(oursPublicKey)
-    , m_socket(std::make_unique<QTcpSocket>())
+    , m_socket(new QTcpSocket(this))
     , m_state(WaitForConnectionValidation)
 {
     connectToSocketSignals();
@@ -38,6 +38,7 @@ EncryptedConnection::EncryptedConnection(const QSslKey& oursPublicKey, QTcpSocke
     , m_socket(socket)
     , m_state(ValidateIncomingConnection)
 {
+    socket->setParent(this);
     connectToSocketSignals();
 }
 
@@ -50,11 +51,9 @@ QSslKey EncryptedConnection::getTheirsPublicKey() const
 
 void EncryptedConnection::connectToSocketSignals()
 {
-    QTcpSocket* s = m_socket.get();
-
-    connect(s, &QTcpSocket::stateChanged, this, &EncryptedConnection::socketStateChanged);
-    connect(s, qOverload<QAbstractSocket::SocketError>(&QTcpSocket::error), this, &EncryptedConnection::socketError);
-    connect(s, &QTcpSocket::readyRead, this, &EncryptedConnection::readyRead);
+    connect(m_socket, &QTcpSocket::stateChanged, this, &EncryptedConnection::socketStateChanged);
+    connect(m_socket, qOverload<QAbstractSocket::SocketError>(&QTcpSocket::error), this, &EncryptedConnection::socketError);
+    connect(m_socket, &QTcpSocket::readyRead, this, &EncryptedConnection::readyRead);
 }
 
 
