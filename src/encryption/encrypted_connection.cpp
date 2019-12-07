@@ -66,6 +66,8 @@ void EncryptedConnection::sendPublicKey()
     const int keyByteArraySize = keyByteArray.size();
     assert(keyByteArraySize < 65536);
 
+    /// @todo Use some nice tool for sending data instead of sending raw bytes.
+    ///       It would be nice to aboif little/big endian problems
     const quint16 public_key_size = keyByteArraySize;
     const char* public_key_size_chars = utils::binary_cast<const char[2]>(public_key_size);
 
@@ -84,6 +86,8 @@ void EncryptedConnection::readTheirsPublicKey()
     m_socket->getChar(&size_table[0]);
     m_socket->getChar(&size_table[1]);
 
+    /// @todo Use some nice tool for sending data instead of sending raw bytes.
+    ///       It would be nice to aboif little/big endian problems
     const int size = utils::binary_cast<quint16>(size_table);
 
     if (m_socket->bytesAvailable() < size)
