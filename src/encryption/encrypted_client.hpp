@@ -20,6 +20,7 @@
 
 #include <memory>
 #include <QString>
+#include <botan/pk_keys.h>
 
 #include "iencrypted_connection.hpp"
 
@@ -33,12 +34,12 @@ struct IConnectionManager;
 class EncryptedClient
 {
     public:
-        EncryptedClient(const QSslKey& ourPublicKey, IConnectionManager &);
+        EncryptedClient(const Botan::Public_Key* ourPublicKey, IConnectionManager &);
 
         void makeConnection(const QString& address, quint16 port);
 
     private:
-        const QSslKey m_ourPublicKey;
+        const Botan::Public_Key* m_ourPublicKey;
         IConnectionManager& m_connectionManager;
 
         void sendPublicKey(QTcpSocket &);

@@ -21,6 +21,7 @@
 #include <memory>
 #include <QTcpServer>
 #include <QSslKey>
+#include <botan/pk_keys.h>
 
 struct IConnectionManager;
 struct IIdentityChecker;
@@ -32,11 +33,11 @@ struct IEncryptedConnection;
 class EncryptedServer final: public QTcpServer
 {
     public:
-        EncryptedServer(const QSslKey& oursPublicKey, const IIdentityChecker &, IConnectionManager &);
+        EncryptedServer(const Botan::Public_Key* oursPublicKey, const IIdentityChecker &, IConnectionManager &);
         ~EncryptedServer();
 
     private:
-        const QSslKey m_oursPublicKey;
+        const Botan::Public_Key* m_oursPublicKey;
         const IIdentityChecker& m_identityChecker;
         IConnectionManager& m_connectionManager;
         std::vector<std::unique_ptr<IEncryptedConnection>> m_waitingForApproval;

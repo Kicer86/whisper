@@ -19,7 +19,7 @@
 #define USERKEYSMANAGER_HPP
 
 #include <QString>
-#include <QSslKey>
+#include <botan/pk_keys.h>
 
 /**
  * @brief Class for managing user's cryptographic keys
@@ -33,7 +33,7 @@ class UserKeysManager
         bool publicKeyExists() const;
         bool generateKeysPair() const;
 
-        QSslKey ourPublicKey() const;
+        std::unique_ptr<Botan::Public_Key> ourPublicKey() const;
 
     private:
         const QString m_keysDir;

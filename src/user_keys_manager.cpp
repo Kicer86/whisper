@@ -21,6 +21,7 @@
 #include <botan/pkcs8.h>
 #include <botan/rsa.h>
 #include <botan/system_rng.h>
+#include <botan/auto_rng.h>
 #include <botan/x509_key.h>
 #include <QDir>
 #include <QFile>
@@ -102,15 +103,11 @@ bool UserKeysManager::generateKeysPair() const
 }
 
 
-QSslKey UserKeysManager::ourPublicKey() const
+std::unique_ptr<Botan::Public_Key> UserKeysManager::ourPublicKey() const
 {
-    QFile publicKeyFile(publicKeyPath());
-    publicKeyFile.open(QFile::ReadOnly);
+    std::unique_ptr<Botan::Public_Key> public_key( Botan::X509::load_key(publicKeyPath().toStdString()) );
 
-    QSslKey key(&publicKeyFile, QSsl::Rsa, QSsl::Pem, QSsl::PublicKey);
-    assert(key.isNull() == false);
-
-    return key;
+    return public_key;
 }
 
 
