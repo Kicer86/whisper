@@ -40,6 +40,8 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
     private:
         QSslKey m_oursPublicKey;
         QSslKey m_theirsPublicKey;
+        static constexpr int m_symmetricKeySize = 32;
+        std::array<unsigned char, m_symmetricKeySize> m_symmetricKey;
         QTcpSocket* m_socket;
 
         struct not_enouth_data: std::exception {};
@@ -55,6 +57,7 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         void connectToSocketSignals();
 
         void sendPublicKey();
+        void sendSymmetricKey();
         void readTheirsPublicKey();
 
         void socketStateChanged(QAbstractSocket::SocketState socketState);

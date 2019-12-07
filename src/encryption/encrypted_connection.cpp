@@ -18,6 +18,7 @@
 #include "encrypted_connection.hpp"
 
 #include <iostream>
+#include <openssl/rand.h>
 
 #include "utils.hpp"
 
@@ -73,6 +74,13 @@ void EncryptedConnection::sendPublicKey()
 
     m_socket->write(public_key_size_chars, 2);
     m_socket->write(keyByteArray);
+}
+
+
+void EncryptedConnection::sendSymmetricKey()
+{
+    RAND_bytes(m_symmetricKey.data(), m_symmetricKeySize);
+
 }
 
 
