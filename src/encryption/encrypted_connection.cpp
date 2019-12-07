@@ -19,6 +19,9 @@
 
 #include <iostream>
 
+#include "utils.hpp"
+
+
 EncryptedConnection::EncryptedConnection(const QSslKey& oursPublicKey, const QString& host, quint16 port)
     : m_oursPublicKey(oursPublicKey)
     , m_socket(new QTcpSocket(this))
@@ -63,15 +66,10 @@ void EncryptedConnection::sendPublicKey()
     const int keyByteArraySize = keyByteArray.size();
     assert(keyByteArraySize < 65536);
 
-    union
-    {
-        quint16 publicKeySize;
-        char publicKeySizeRaw[2];
-    } publicKeyUnion;
+    const quint16 public_key_size = keyByteArraySize;
+    const char* public_key_size_chars = utils::binary_cast<const char[2]>(public_key_size);
 
-    publicKeyUnion.publicKeySize = keyByteArraySize;
-
-    m_socket->write(publicKeyUnion.publicKeySizeRaw, 2);
+    m_socket->write(public_key_size_chars, 2);
     m_socket->write(keyByteArray);
 }
 
@@ -81,22 +79,18 @@ void EncryptedConnection::readTheirsPublicKey()
     if (m_socket->bytesAvailable() < 2)
         throw not_enouth_data{};
 
-    union
-    {
-        char signedBytes[2];
-        quint16 size;
-    } sizeTranslator;
+    char size_table[2];
 
-    m_socket->getChar(&sizeTranslator.signedBytes[0]);
-    m_socket->getChar(&sizeTranslator.signedBytes[1]);
+    m_socket->getChar(&size_table[0]);
+    m_socket->getChar(&size_table[1]);
 
-    const int size = sizeTranslator.size;
+    const int size = utils::binary_cast<quint16>(size_table);
 
     if (m_socket->bytesAvailable() < size)
     {
         // undo any reads - wait for more
-        m_socket->ungetChar(sizeTranslator.signedBytes[1]);
-        m_socket->ungetChar(sizeTranslator.signedBytes[0]);
+        m_socket->ungetChar(size_table[1]);
+        m_socket->ungetChar(size_table[0]);
 
         throw not_enouth_data{};
     }
