@@ -43,7 +43,7 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         const IKeysProvider* m_ourKeys;
         std::unique_ptr<Botan::Public_Key> m_theirsPublicKey;
         static constexpr int m_symmetricKeySize = 32;
-        std::array<unsigned char, m_symmetricKeySize> m_symmetricKey;
+        std::vector<unsigned char> m_symmetricKey;
         QTcpSocket* m_socket;
 
         struct not_enouth_data: std::exception {};

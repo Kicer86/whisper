@@ -19,7 +19,10 @@
 
 #include <iostream>
 #include <botan/data_src.h>
+#include <botan/pubkey.h>
 #include <botan/x509_key.h>
+#include <botan/system_rng.h>
+#include <botan/auto_rng.h>
 
 #include "ikeys_provider.hpp"
 #include "utils.hpp"
@@ -29,6 +32,7 @@ EncryptedConnection::EncryptedConnection(const IKeysProvider* ourKeys, const QSt
     : m_ourKeys(ourKeys)
     , m_socket(new QTcpSocket(this))
     , m_state(WaitForConnectionValidation)
+    , m_symmetricKey(32)
 {
     connectToSocketSignals();
 
@@ -43,6 +47,7 @@ EncryptedConnection::EncryptedConnection(const IKeysProvider* ourKeys, QTcpSocke
     : m_ourKeys(ourKeys)
     , m_socket(socket)
     , m_state(ValidateIncomingConnection)
+    , m_symmetricKey(32)
 {
     socket->setParent(this);
     connectToSocketSignals();
@@ -82,8 +87,20 @@ void EncryptedConnection::sendPublicKey()
 
 void EncryptedConnection::sendSymmetricKey()
 {
-//    RAND_bytes(m_symmetricKey.data(), m_symmetricKeySize);
+    std::unique_ptr<Botan::RandomNumberGenerator> rng;
+    #if defined(BOTAN_HAS_SYSTEM_RNG)
+    rng.reset(new Botan::System_RNG);
+    #else
+    rng.reset(new Botan::AutoSeeded_RNG);
+    #endif
 
+    for(int i = 0; i < m_symmetricKeySize; i++)
+        m_symmetricKey[i] = rng->next_byte();
+
+    Botan::PK_Encryptor_EME enc(*m_theirsPublicKey, *rng.get(), "EME1(SHA-256)");
+    std::vector<uint8_t> encrypted_key = enc.encrypt(m_symmetricKey,*rng.get());
+
+    m_socket->write(reinterpret_cast<const char *>(encrypted_key.data()), encrypted_key.size());
 }
 
 
@@ -147,6 +164,7 @@ void EncryptedConnection::readyRead()
 
                     /// @todo: validate connection
                     sendPublicKey();
+                    sendSymmetricKey();
                     m_state = ConnectionEstablished;
 
                     std::cout << "client accepted\n";
