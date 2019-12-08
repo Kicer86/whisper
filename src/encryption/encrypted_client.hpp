@@ -26,6 +26,7 @@
 
 class QTcpSocket;
 struct IConnectionManager;
+struct IKeysProvider;
 
 
 /**
@@ -34,12 +35,12 @@ struct IConnectionManager;
 class EncryptedClient
 {
     public:
-        EncryptedClient(const Botan::Public_Key* ourPublicKey, IConnectionManager &);
+        EncryptedClient(const IKeysProvider* ourKeys, IConnectionManager &);
 
         void makeConnection(const QString& address, quint16 port);
 
     private:
-        const Botan::Public_Key* m_ourPublicKey;
+        const IKeysProvider* m_ourKeys;
         IConnectionManager& m_connectionManager;
 
         void sendPublicKey(QTcpSocket &);

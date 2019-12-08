@@ -24,8 +24,8 @@
 #include "iconnection_manager.hpp"
 
 
-EncryptedServer::EncryptedServer(const Botan::Public_Key* oursPublicKey, const IIdentityChecker& identityChecker, IConnectionManager& connection_manager)
-    : m_oursPublicKey(oursPublicKey)
+EncryptedServer::EncryptedServer(const IKeysProvider* ourKeys, const IIdentityChecker& identityChecker, IConnectionManager& connection_manager)
+    : m_ourKeys(ourKeys)
     , m_identityChecker(identityChecker)
     , m_connectionManager(m_connectionManager)
 {
@@ -45,7 +45,7 @@ void EncryptedServer::newConnection()
     {
         QTcpSocket* socket = nextPendingConnection();
 
-        auto encrypted_connection = std::make_unique<EncryptedConnection>(m_oursPublicKey, socket);
+        auto encrypted_connection = std::make_unique<EncryptedConnection>(m_ourKeys, socket);
         m_waitingForApproval.push_back(std::move(encrypted_connection));
     }
 }

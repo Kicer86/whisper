@@ -24,10 +24,10 @@
 #include "encryption/iidentity_checker.hpp"
 
 
-Server::Server(const Botan::Public_Key* oursPublicKey, IConnectionManager& connection_manager, quint16 port, QObject* p):
+Server::Server(const IKeysProvider* ourKeys, IConnectionManager& connection_manager, quint16 port, QObject* p):
     QObject(p),
     m_identityChecker(),
-    m_server(oursPublicKey, m_identityChecker, connection_manager),
+    m_server(ourKeys, m_identityChecker, connection_manager),
     m_port(port)
 {
 }

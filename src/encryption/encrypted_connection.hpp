@@ -23,6 +23,8 @@
 
 #include <QTcpSocket>
 
+struct IKeysProvider;
+
 /**
  * @brief representation of encrypted connection
  */
@@ -32,13 +34,13 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         Q_OBJECT
 
     public:
-        EncryptedConnection(const Botan::Public_Key* oursPublicKey, const QString& host, quint16 port);
-        EncryptedConnection(const Botan::Public_Key* oursPublicKey, QTcpSocket *);
+        EncryptedConnection(const IKeysProvider* ourKeys, const QString& host, quint16 port);
+        EncryptedConnection(const IKeysProvider* ourKeys, QTcpSocket *);
 
         const Botan::Public_Key* getTheirsPublicKey() const override;
 
     private:
-        const Botan::Public_Key* m_oursPublicKey;
+        const IKeysProvider* m_ourKeys;
         std::unique_ptr<Botan::Public_Key> m_theirsPublicKey;
         static constexpr int m_symmetricKeySize = 32;
         std::array<unsigned char, m_symmetricKeySize> m_symmetricKey;

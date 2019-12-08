@@ -26,7 +26,7 @@
 /**
  * @brief Class for managing user's cryptographic keys
  */
-class UserKeysManager: IKeysProvider
+class UserKeysManager: public IKeysProvider
 {
     public:
         UserKeysManager(const QString& keys_dir);

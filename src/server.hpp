@@ -25,12 +25,15 @@
 #include "encryption/encrypted_server.hpp"
 #include "identity_checker.hpp"
 
+struct IKeysProvider;
+
+
 class Server final: public QObject
 {
         Q_OBJECT
 
     public:
-        Server(const Botan::Public_Key* oursPublicKey, IConnectionManager& connection_manager, quint16 port, QObject * = nullptr);
+        Server(const IKeysProvider* ourKeys, IConnectionManager& connection_manager, quint16 port, QObject * = nullptr);
         ~Server();
 
         void start();

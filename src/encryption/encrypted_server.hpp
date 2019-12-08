@@ -26,6 +26,7 @@
 struct IConnectionManager;
 struct IIdentityChecker;
 struct IEncryptedConnection;
+struct IKeysProvider;
 
 /**
  * @brief Server providing encrypted connections
@@ -33,11 +34,11 @@ struct IEncryptedConnection;
 class EncryptedServer final: public QTcpServer
 {
     public:
-        EncryptedServer(const Botan::Public_Key* oursPublicKey, const IIdentityChecker &, IConnectionManager &);
+        EncryptedServer(const IKeysProvider* ourKeys, const IIdentityChecker &, IConnectionManager &);
         ~EncryptedServer();
 
     private:
-        const Botan::Public_Key* m_oursPublicKey;
+        const IKeysProvider* m_ourKeys;
         const IIdentityChecker& m_identityChecker;
         IConnectionManager& m_connectionManager;
         std::vector<std::unique_ptr<IEncryptedConnection>> m_waitingForApproval;

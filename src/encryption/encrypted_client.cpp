@@ -23,8 +23,8 @@
 #include "iconnection_manager.hpp"
 
 
-EncryptedClient::EncryptedClient(const Botan::Public_Key* ourPublicKey, IConnectionManager& connection_manager)
-    : m_ourPublicKey(ourPublicKey)
+EncryptedClient::EncryptedClient(const IKeysProvider* ourKeys, IConnectionManager& connection_manager)
+    : m_ourKeys(ourKeys)
     , m_connectionManager(connection_manager)
 {
     /// @todo do no work with invalid public key
@@ -33,7 +33,7 @@ EncryptedClient::EncryptedClient(const Botan::Public_Key* ourPublicKey, IConnect
 
 void EncryptedClient::makeConnection(const QString& address, quint16 port)
 {
-    auto encryptedConnection = std::make_unique<EncryptedConnection>(m_ourPublicKey, address, port);
+    auto encryptedConnection = std::make_unique<EncryptedConnection>(m_ourKeys, address, port);
 
     m_connectionManager.add(std::move(encryptedConnection));
 }

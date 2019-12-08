@@ -21,11 +21,12 @@
 #include <botan/data_src.h>
 #include <botan/x509_key.h>
 
+#include "ikeys_provider.hpp"
 #include "utils.hpp"
 
 
-EncryptedConnection::EncryptedConnection(const Botan::Public_Key* oursPublicKey, const QString& host, quint16 port)
-    : m_oursPublicKey(oursPublicKey)
+EncryptedConnection::EncryptedConnection(const IKeysProvider* ourKeys, const QString& host, quint16 port)
+    : m_ourKeys(ourKeys)
     , m_socket(new QTcpSocket(this))
     , m_state(WaitForConnectionValidation)
 {
@@ -38,8 +39,8 @@ EncryptedConnection::EncryptedConnection(const Botan::Public_Key* oursPublicKey,
 
 
 
-EncryptedConnection::EncryptedConnection(const Botan::Public_Key* oursPublicKey, QTcpSocket* socket)
-    : m_oursPublicKey(oursPublicKey)
+EncryptedConnection::EncryptedConnection(const IKeysProvider* ourKeys, QTcpSocket* socket)
+    : m_ourKeys(ourKeys)
     , m_socket(socket)
     , m_state(ValidateIncomingConnection)
 {
@@ -64,7 +65,8 @@ void EncryptedConnection::connectToSocketSignals()
 
 void EncryptedConnection::sendPublicKey()
 {
-    const QByteArray keyByteArray = Botan::X509::PEM_encode(*m_oursPublicKey).c_str();
+    auto ourPublicKey = m_ourKeys->ourPublicKey();
+    const QByteArray keyByteArray = Botan::X509::PEM_encode(*ourPublicKey.get()).c_str();
     const int keyByteArraySize = keyByteArray.size();
     assert(keyByteArraySize < 65536);
 

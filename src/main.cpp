@@ -44,12 +44,11 @@ int main(int argc, char** argv)
 
     ConnectionManager connectionManager;
 
-    auto oursPublicKey = manager.ourPublicKey();
-    Server server(oursPublicKey.get(), connectionManager, configuration.getEntry("port").toInt());
+    Server server(&manager, connectionManager, configuration.getEntry("port").toInt());
     server.start();
 
     // temporary debug code
-    EncryptedClient client(oursPublicKey.get(), connectionManager);
+    EncryptedClient client(&manager, connectionManager);
     if (configuration.getEntry("port").toInt() != 1234)
         client.makeConnection("localhost", 1234);
 
