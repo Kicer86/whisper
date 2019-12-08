@@ -111,6 +111,21 @@ std::unique_ptr<Botan::Public_Key> UserKeysManager::ourPublicKey() const
 }
 
 
+std::unique_ptr<Botan::Private_Key> UserKeysManager::ourPrivateKey() const
+{
+    std::unique_ptr<Botan::RandomNumberGenerator> rng;
+    #if defined(BOTAN_HAS_SYSTEM_RNG)
+    rng.reset(new Botan::System_RNG);
+    #else
+    rng.reset(new Botan::AutoSeeded_RNG);
+    #endif
+
+    std::unique_ptr<Botan::Private_Key> public_key( Botan::PKCS8::load_key(privateKeyPath().toStdString(), *rng.get()) );
+
+    return public_key;
+}
+
+
 QString UserKeysManager::publicKeyPath() const
 {
     return QString("%1/%2").arg(m_keysDir).arg("rsa-public.pem");

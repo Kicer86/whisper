@@ -21,10 +21,12 @@
 #include <QString>
 #include <botan/pk_keys.h>
 
+#include "encryption/ikeys_provider.hpp"
+
 /**
  * @brief Class for managing user's cryptographic keys
  */
-class UserKeysManager
+class UserKeysManager: IKeysProvider
 {
     public:
         UserKeysManager(const QString& keys_dir);
@@ -33,7 +35,8 @@ class UserKeysManager
         bool publicKeyExists() const;
         bool generateKeysPair() const;
 
-        std::unique_ptr<Botan::Public_Key> ourPublicKey() const;
+        std::unique_ptr<Botan::Public_Key> ourPublicKey() const override;
+        std::unique_ptr<Botan::Private_Key> ourPrivateKey() const override;
 
     private:
         const QString m_keysDir;
