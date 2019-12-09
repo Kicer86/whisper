@@ -30,6 +30,7 @@ class UserKeysManager: public IKeysProvider
 {
     public:
         UserKeysManager(const QString& keys_dir);
+        ~UserKeysManager();
 
         bool privateKeyExists() const;
         bool publicKeyExists() const;
@@ -37,8 +38,10 @@ class UserKeysManager: public IKeysProvider
 
         std::unique_ptr<Botan::Public_Key> ourPublicKey() const override;
         std::unique_ptr<Botan::Private_Key> ourPrivateKey() const override;
+        Botan::RandomNumberGenerator& randomGenerator() const override;
 
     private:
+        const std::unique_ptr<Botan::RandomNumberGenerator> m_randomGenerator;
         const QString m_keysDir;
 
         QString privateKeyPath() const;

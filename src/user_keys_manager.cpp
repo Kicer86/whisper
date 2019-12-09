@@ -37,13 +37,31 @@ namespace
         if (status != 1)
             throw std::runtime_error("Botan error");
     }
+
+    std::unique_ptr<Botan::RandomNumberGenerator> random_number_generator()
+    {
+        std::unique_ptr<Botan::RandomNumberGenerator> rng;
+        #if defined(BOTAN_HAS_SYSTEM_RNG)
+        rng.reset(new Botan::System_RNG);
+        #else
+        rng.reset(new Botan::AutoSeeded_RNG);
+        #endif
+
+        return rng;
+    }
 }
 
 
 UserKeysManager::UserKeysManager(const QString& keys_dir)
-    : m_keysDir(keys_dir)
+    : m_randomGenerator(random_number_generator())
+    , m_keysDir(keys_dir)
 {
 
+}
+
+
+UserKeysManager::~UserKeysManager()
+{
 }
 
 
@@ -74,14 +92,8 @@ bool UserKeysManager::generateKeysPair() const
         const QString private_key_path = privateKeyPath();
         const QString public_key_path = publicKeyPath();
 
-        std::unique_ptr<Botan::RandomNumberGenerator> rng;
-        #if defined(BOTAN_HAS_SYSTEM_RNG)
-        rng.reset(new Botan::System_RNG);
-        #else
-        rng.reset(new Botan::AutoSeeded_RNG);
-        #endif
-
-        Botan::RSA_PrivateKey key_pair(*rng.get(), bits);
+        Botan::RandomNumberGenerator& rng = randomGenerator();
+        Botan::RSA_PrivateKey key_pair(rng, bits);
 
         std::string public_key = Botan::X509::PEM_encode(key_pair);
         std::string private_key = Botan::PKCS8::PEM_encode(key_pair);
@@ -113,17 +125,18 @@ std::unique_ptr<Botan::Public_Key> UserKeysManager::ourPublicKey() const
 
 std::unique_ptr<Botan::Private_Key> UserKeysManager::ourPrivateKey() const
 {
-    std::unique_ptr<Botan::RandomNumberGenerator> rng;
-    #if defined(BOTAN_HAS_SYSTEM_RNG)
-    rng.reset(new Botan::System_RNG);
-    #else
-    rng.reset(new Botan::AutoSeeded_RNG);
-    #endif
-
-    std::unique_ptr<Botan::Private_Key> private_key( Botan::PKCS8::load_key(privateKeyPath().toStdString(), *rng.get()) );
+    Botan::RandomNumberGenerator& rng = randomGenerator();
+    std::unique_ptr<Botan::Private_Key> private_key( Botan::PKCS8::load_key(privateKeyPath().toStdString(), rng) );
 
     return private_key;
 }
+
+
+Botan::RandomNumberGenerator& UserKeysManager::randomGenerator() const
+{
+    return *m_randomGenerator.get();
+}
+
 
 
 QString UserKeysManager::publicKeyPath() const

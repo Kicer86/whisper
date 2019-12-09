@@ -8,6 +8,7 @@ struct IKeysProvider
     virtual ~IKeysProvider() = default;
     virtual std::unique_ptr<Botan::Public_Key> ourPublicKey() const = 0;
     virtual std::unique_ptr<Botan::Private_Key> ourPrivateKey() const = 0;
+    virtual Botan::RandomNumberGenerator& randomGenerator() const = 0;
 };
 
 
