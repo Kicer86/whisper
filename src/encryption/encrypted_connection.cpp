@@ -87,18 +87,13 @@ void EncryptedConnection::sendPublicKey()
 
 void EncryptedConnection::sendSymmetricKey()
 {
-    std::unique_ptr<Botan::RandomNumberGenerator> rng;
-    #if defined(BOTAN_HAS_SYSTEM_RNG)
-    rng.reset(new Botan::System_RNG);
-    #else
-    rng.reset(new Botan::AutoSeeded_RNG);
-    #endif
+    Botan::RandomNumberGenerator& rng = m_ourKeys->randomGenerator();
 
     for(int i = 0; i < m_symmetricKeySize; i++)
-        m_symmetricKey[i] = rng->next_byte();
+        m_symmetricKey[i] = rng.next_byte();
 
-    Botan::PK_Encryptor_EME enc(*m_theirsPublicKey, *rng.get(), "EME1(SHA-256)");
-    std::vector<uint8_t> encrypted_key = enc.encrypt(m_symmetricKey,*rng.get());
+    Botan::PK_Encryptor_EME enc(*m_theirsPublicKey, rng, "EME1(SHA-256)");
+    std::vector<uint8_t> encrypted_key = enc.encrypt(m_symmetricKey, rng);
 
     const quint16 encrypted_message_size = encrypted_key.size();
     const char* encrypted_message_size_chars = utils::binary_cast<const char[2]>(encrypted_message_size);
@@ -166,17 +161,12 @@ void EncryptedConnection::readSymmetricKey()
     }
     else
     {
-        std::unique_ptr<Botan::RandomNumberGenerator> rng;
-        #if defined(BOTAN_HAS_SYSTEM_RNG)
-        rng.reset(new Botan::System_RNG);
-        #else
-        rng.reset(new Botan::AutoSeeded_RNG);
-        #endif
+        Botan::RandomNumberGenerator& rng = m_ourKeys->randomGenerator();
 
         QByteArray encrypted_symmetric_key = m_socket->read(size);
 
         std::unique_ptr<Botan::Private_Key> private_key = m_ourKeys->ourPrivateKey();
-        Botan::PK_Decryptor_EME dec(*private_key.get(), *rng.get(), "EME1(SHA-256)");
+        Botan::PK_Decryptor_EME dec(*private_key.get(), rng, "EME1(SHA-256)");
 
         const uint8_t* encrypted_symmetric_key_bytes = reinterpret_cast<const uint8_t*>(encrypted_symmetric_key.constData());
         auto decrypted_symmetric_key = dec.decrypt(encrypted_symmetric_key_bytes, encrypted_symmetric_key.size());
