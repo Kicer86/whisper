@@ -120,9 +120,9 @@ std::unique_ptr<Botan::Private_Key> UserKeysManager::ourPrivateKey() const
     rng.reset(new Botan::AutoSeeded_RNG);
     #endif
 
-    std::unique_ptr<Botan::Private_Key> public_key( Botan::PKCS8::load_key(privateKeyPath().toStdString(), *rng.get()) );
+    std::unique_ptr<Botan::Private_Key> private_key( Botan::PKCS8::load_key(privateKeyPath().toStdString(), *rng.get()) );
 
-    return public_key;
+    return private_key;
 }
 
 
