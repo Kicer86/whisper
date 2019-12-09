@@ -24,7 +24,7 @@
 #include <botan/system_rng.h>
 #include <botan/auto_rng.h>
 
-#include "ikeys_provider.hpp"
+#include "iencryption_primitives_provider.hpp"
 #include "utils.hpp"
 
 

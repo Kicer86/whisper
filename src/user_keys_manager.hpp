@@ -21,7 +21,7 @@
 #include <QString>
 #include <botan/pk_keys.h>
 
-#include "encryption/ikeys_provider.hpp"
+#include "encryption/iencryption_primitives_provider.hpp"
 
 /**
  * @brief Class for managing user's cryptographic keys
