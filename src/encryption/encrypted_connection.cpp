@@ -142,6 +142,53 @@ void EncryptedConnection::readTheirsPublicKey()
 }
 
 
+void EncryptedConnection::readSymmetricKey()
+{
+    if (m_socket->bytesAvailable() < 2)
+        throw not_enouth_data{};
+
+    char size_table[2];
+
+    m_socket->getChar(&size_table[0]);
+    m_socket->getChar(&size_table[1]);
+
+    /// @todo Use some nice tool for sending data instead of sending raw bytes.
+    ///       It would be nice to aboif little/big endian problems
+    const int size = utils::binary_cast<quint16>(size_table);
+
+    if (m_socket->bytesAvailable() < size)
+    {
+        // undo any reads - wait for more
+        m_socket->ungetChar(size_table[1]);
+        m_socket->ungetChar(size_table[0]);
+
+        throw not_enouth_data{};
+    }
+    else
+    {
+        std::unique_ptr<Botan::RandomNumberGenerator> rng;
+        #if defined(BOTAN_HAS_SYSTEM_RNG)
+        rng.reset(new Botan::System_RNG);
+        #else
+        rng.reset(new Botan::AutoSeeded_RNG);
+        #endif
+
+        QByteArray encrypted_symmetric_key = m_socket->read(size);
+
+        std::unique_ptr<Botan::Private_Key> private_key = m_ourKeys->ourPrivateKey();
+        Botan::PK_Decryptor_EME dec(*private_key.get(), *rng.get(), "EME1(SHA-256)");
+
+        const uint8_t* encrypted_symmetric_key_bytes = reinterpret_cast<const uint8_t*>(encrypted_symmetric_key.constData());
+        auto decrypted_symmetric_key = dec.decrypt(encrypted_symmetric_key_bytes, encrypted_symmetric_key.size());
+
+        m_symmetricKey.clear();
+        std::copy(decrypted_symmetric_key.cbegin(),
+                  decrypted_symmetric_key.cend(),
+                  std::back_inserter(m_symmetricKey));
+    }
+}
+
+
 void EncryptedConnection::socketStateChanged(QAbstractSocket::SocketState socketState)
 {
     std::cout << "client socket state changed to: " << socketState << "\n";
@@ -181,9 +228,17 @@ void EncryptedConnection::readyRead()
                     readTheirsPublicKey();
 
                     /// @todo: validate connection
-                    m_state = ConnectionEstablished;
+                    m_state = WaitForSymmetricKey;
 
                     std::cout << "accepted by server\n";
+                    break;
+                }
+
+                case WaitForSymmetricKey:
+                {
+                    readSymmetricKey();
+
+                    m_state = ConnectionEstablished;
                     break;
                 }
 

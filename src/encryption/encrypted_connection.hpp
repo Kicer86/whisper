@@ -53,6 +53,7 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         {
             WaitForConnectionValidation,
             ValidateIncomingConnection,
+            WaitForSymmetricKey,
             ConnectionEstablished,
         } m_state;
 
@@ -61,6 +62,7 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         void sendPublicKey();
         void sendSymmetricKey();
         void readTheirsPublicKey();
+        void readSymmetricKey();
 
         void socketStateChanged(QAbstractSocket::SocketState socketState);
         void socketError(QAbstractSocket::SocketError);
