@@ -26,7 +26,7 @@
 /**
  * @brief Class for managing user's cryptographic keys
  */
-class UserKeysManager: public IKeysProvider
+class UserKeysManager: public IEncryptionPrimitivesProvider
 {
     public:
         UserKeysManager(const QString& keys_dir);

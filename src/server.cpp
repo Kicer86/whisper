@@ -24,7 +24,7 @@
 #include "encryption/iidentity_checker.hpp"
 
 
-Server::Server(const IKeysProvider* ourKeys, IConnectionManager& connection_manager, quint16 port, QObject* p):
+Server::Server(const IEncryptionPrimitivesProvider* ourKeys, IConnectionManager& connection_manager, quint16 port, QObject* p):
     QObject(p),
     m_identityChecker(),
     m_server(ourKeys, m_identityChecker, connection_manager),

@@ -23,7 +23,7 @@
 #include "iconnection_manager.hpp"
 
 
-EncryptedClient::EncryptedClient(const IKeysProvider* ourKeys, IConnectionManager& connection_manager)
+EncryptedClient::EncryptedClient(const IEncryptionPrimitivesProvider* ourKeys, IConnectionManager& connection_manager)
     : m_ourKeys(ourKeys)
     , m_connectionManager(connection_manager)
 {

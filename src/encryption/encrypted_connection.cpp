@@ -28,7 +28,7 @@
 #include "utils.hpp"
 
 
-EncryptedConnection::EncryptedConnection(const IKeysProvider* ourKeys, const QString& host, quint16 port)
+EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, const QString& host, quint16 port)
     : m_ourKeys(ourKeys)
     , m_socket(new QTcpSocket(this))
     , m_state(WaitForConnectionValidation)
@@ -43,7 +43,7 @@ EncryptedConnection::EncryptedConnection(const IKeysProvider* ourKeys, const QSt
 
 
 
-EncryptedConnection::EncryptedConnection(const IKeysProvider* ourKeys, QTcpSocket* socket)
+EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, QTcpSocket* socket)
     : m_ourKeys(ourKeys)
     , m_socket(socket)
     , m_state(ValidateIncomingConnection)

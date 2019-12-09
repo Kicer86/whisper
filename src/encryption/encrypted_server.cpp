@@ -24,7 +24,7 @@
 #include "iconnection_manager.hpp"
 
 
-EncryptedServer::EncryptedServer(const IKeysProvider* ourKeys, const IIdentityChecker& identityChecker, IConnectionManager& connection_manager)
+EncryptedServer::EncryptedServer(const IEncryptionPrimitivesProvider* ourKeys, const IIdentityChecker& identityChecker, IConnectionManager& connection_manager)
     : m_ourKeys(ourKeys)
     , m_identityChecker(identityChecker)
     , m_connectionManager(m_connectionManager)

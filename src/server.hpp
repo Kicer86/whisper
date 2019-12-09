@@ -25,7 +25,7 @@
 #include "encryption/encrypted_server.hpp"
 #include "identity_checker.hpp"
 
-struct IKeysProvider;
+struct IEncryptionPrimitivesProvider;
 
 
 class Server final: public QObject
@@ -33,7 +33,7 @@ class Server final: public QObject
         Q_OBJECT
 
     public:
-        Server(const IKeysProvider* ourKeys, IConnectionManager& connection_manager, quint16 port, QObject * = nullptr);
+        Server(const IEncryptionPrimitivesProvider* ourKeys, IConnectionManager& connection_manager, quint16 port, QObject * = nullptr);
         ~Server();
 
         void start();

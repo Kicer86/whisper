@@ -26,7 +26,7 @@
 
 class QTcpSocket;
 struct IConnectionManager;
-struct IKeysProvider;
+struct IEncryptionPrimitivesProvider;
 
 
 /**
@@ -35,12 +35,12 @@ struct IKeysProvider;
 class EncryptedClient
 {
     public:
-        EncryptedClient(const IKeysProvider* ourKeys, IConnectionManager &);
+        EncryptedClient(const IEncryptionPrimitivesProvider* ourKeys, IConnectionManager &);
 
         void makeConnection(const QString& address, quint16 port);
 
     private:
-        const IKeysProvider* m_ourKeys;
+        const IEncryptionPrimitivesProvider* m_ourKeys;
         IConnectionManager& m_connectionManager;
 
         void sendPublicKey(QTcpSocket &);
