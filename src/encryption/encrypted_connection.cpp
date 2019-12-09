@@ -56,7 +56,7 @@ const Botan::Public_Key* EncryptedConnection::getTheirsPublicKey() const
 
 EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, QTcpSocket* socket, State state)
     : m_ourKeys(ourKeys)
-    , m_symmetricKey(32)
+    , m_symmetricKey(m_symmetricKeySize)
     , m_socket(socket)
     , m_state(state)
 {
