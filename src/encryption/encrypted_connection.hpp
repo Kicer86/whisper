@@ -57,6 +57,8 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
             ConnectionEstablished,
         } m_state;
 
+        EncryptedConnection(const IEncryptionPrimitivesProvider *, QTcpSocket *, State);
+
         void connectToSocketSignals();
 
         void sendPublicKey();

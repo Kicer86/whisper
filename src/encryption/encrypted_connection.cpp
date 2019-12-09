@@ -29,10 +29,7 @@
 
 
 EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, const QString& host, quint16 port)
-    : m_ourKeys(ourKeys)
-    , m_socket(new QTcpSocket(this))
-    , m_state(WaitForConnectionValidation)
-    , m_symmetricKey(32)
+    : EncryptedConnection(ourKeys, new QTcpSocket(this), WaitForConnectionValidation)
 {
     connectToSocketSignals();
 
@@ -44,10 +41,7 @@ EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ou
 
 
 EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, QTcpSocket* socket)
-    : m_ourKeys(ourKeys)
-    , m_socket(socket)
-    , m_state(ValidateIncomingConnection)
-    , m_symmetricKey(32)
+    : EncryptedConnection(ourKeys, socket, ValidateIncomingConnection)
 {
     socket->setParent(this);
     connectToSocketSignals();
@@ -57,6 +51,15 @@ EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ou
 const Botan::Public_Key* EncryptedConnection::getTheirsPublicKey() const
 {
     return m_theirsPublicKey.get();
+}
+
+
+EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, QTcpSocket* socket, State state)
+    : m_ourKeys(ourKeys)
+    , m_symmetricKey(32)
+    , m_socket(socket)
+    , m_state(state)
+{
 }
 
 
