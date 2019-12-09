@@ -100,6 +100,10 @@ void EncryptedConnection::sendSymmetricKey()
     Botan::PK_Encryptor_EME enc(*m_theirsPublicKey, *rng.get(), "EME1(SHA-256)");
     std::vector<uint8_t> encrypted_key = enc.encrypt(m_symmetricKey,*rng.get());
 
+    const quint16 encrypted_message_size = encrypted_key.size();
+    const char* encrypted_message_size_chars = utils::binary_cast<const char[2]>(encrypted_message_size);
+
+    m_socket->write(encrypted_message_size_chars, 2);
     m_socket->write(reinterpret_cast<const char *>(encrypted_key.data()), encrypted_key.size());
 }
 
