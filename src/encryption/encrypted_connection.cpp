@@ -27,6 +27,8 @@
 #include "iencryption_primitives_provider.hpp"
 #include "utils.hpp"
 
+/// @todo: instead of passing or creating TcpSocket here, a QIODevice should be passed.
+//         this would make UT possible.
 
 EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, const QString& host, quint16 port)
     : EncryptedConnection(ourKeys, new QTcpSocket(this), WaitForConnectionValidation)
