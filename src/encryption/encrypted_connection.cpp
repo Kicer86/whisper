@@ -31,8 +31,9 @@
 //         this would make UT possible.
 
 EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, const QString& host, quint16 port)
-    : EncryptedConnection(ourKeys, new QTcpSocket(this), WaitForConnectionValidation)
+    : EncryptedConnection(ourKeys, WaitForConnectionValidation)
 {
+    m_socket = new QTcpSocket(this);
     connectToSocketSignals();
 
     m_socket->connectToHost(host, port);
@@ -43,9 +44,11 @@ EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ou
 
 
 EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, QTcpSocket* socket)
-    : EncryptedConnection(ourKeys, socket, ValidateIncomingConnection)
+    : EncryptedConnection(ourKeys, ValidateIncomingConnection)
 {
-    socket->setParent(this);
+    m_socket = socket;
+    m_socket->setParent(this);
+
     connectToSocketSignals();
 }
 
@@ -56,10 +59,10 @@ const Botan::Public_Key* EncryptedConnection::getTheirsPublicKey() const
 }
 
 
-EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, QTcpSocket* socket, State state)
+EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, State state)
     : m_ourKeys(ourKeys)
     , m_symmetricKey(m_symmetricKeySize)
-    , m_socket(socket)
+    , m_socket(nullptr)
     , m_state(state)
 {
 }
@@ -70,6 +73,7 @@ void EncryptedConnection::connectToSocketSignals()
     connect(m_socket, &QTcpSocket::stateChanged, this, &EncryptedConnection::socketStateChanged);
     connect(m_socket, qOverload<QAbstractSocket::SocketError>(&QTcpSocket::error), this, &EncryptedConnection::socketError);
     connect(m_socket, &QTcpSocket::readyRead, this, &EncryptedConnection::readyRead);
+    connect(m_socket, &QTcpSocket::disconnected, this, &EncryptedConnection::disconnected);
 }
 
 
@@ -229,4 +233,10 @@ void EncryptedConnection::readyRead()
     }
     catch(const not_enouth_data &) {}       /// this is not failure, wait for more
     catch(const unexpected_data &) {}       /// some error in protocol, @todo kill connection
+}
+
+
+void EncryptedConnection::disconnected()
+{
+    std::cout << "socket disconnected\n";
 }
