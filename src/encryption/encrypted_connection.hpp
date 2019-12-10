@@ -65,6 +65,7 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         void sendSymmetricKey();
         void readTheirsPublicKey();
         void readSymmetricKey();
+        QByteArray readDataWithSizeHeader();
 
         void socketStateChanged(QAbstractSocket::SocketState socketState);
         void socketError(QAbstractSocket::SocketError);
