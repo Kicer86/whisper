@@ -36,6 +36,7 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
     public:
         EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, const QString& host, quint16 port);
         EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, QTcpSocket *);
+        ~EncryptedConnection();
 
         const Botan::Public_Key* getTheirsPublicKey() const override;
 

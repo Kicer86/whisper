@@ -53,6 +53,14 @@ EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ou
 }
 
 
+EncryptedConnection::~EncryptedConnection()
+{
+    m_socket->disconnectFromHost();
+
+    m_socket->state() == QAbstractSocket::UnconnectedState || m_socket->waitForDisconnected(1000);
+}
+
+
 const Botan::Public_Key* EncryptedConnection::getTheirsPublicKey() const
 {
     return m_theirsPublicKey.get();
