@@ -55,6 +55,7 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
             AcceptClient,
             WaitForSymmetricKeyFromHost,
             ConnectionEstablished,
+            Ready,
         } m_state;
 
         EncryptedConnection(const IEncryptionPrimitivesProvider *, State);
@@ -73,7 +74,7 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         void disconnected();
 
     signals:
-        void gotTheirsPublicKey(IEncryptedConnection *);
+        void connectionEstablished(IEncryptedConnection *);
 };
 
 

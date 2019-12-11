@@ -242,6 +242,12 @@ void EncryptedConnection::readyRead()
                     break;
                 }
             }
+
+        if (m_state == ConnectionEstablished)
+        {
+            emit connectionEstablished(this);
+            m_state = Ready;
+        }
     }
     catch(const not_enouth_data &) {}       /// this is not failure, wait for more
     catch(const unexpected_data &) {}       /// some error in protocol, @todo kill connection
