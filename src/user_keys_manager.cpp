@@ -32,12 +32,6 @@ namespace
 {
     constexpr int bits = 4096;
 
-    void check_ssl_status(int status)
-    {
-        if (status != 1)
-            throw std::runtime_error("Botan error");
-    }
-
     std::unique_ptr<Botan::RandomNumberGenerator> random_number_generator()
     {
         std::unique_ptr<Botan::RandomNumberGenerator> rng;
