@@ -44,7 +44,8 @@ int main(int argc, char** argv)
 
     ConnectionManager connectionManager;
 
-    Server server(&manager, connectionManager, configuration.getEntry("port").toInt());
+    const quint16 port = static_cast<quint16>(configuration.getEntry("port").toInt());
+    Server server(&manager, connectionManager, port);
     server.start();
 
     // temporary debug code
