@@ -27,7 +27,7 @@
 EncryptedServer::EncryptedServer(const IEncryptionPrimitivesProvider* ourKeys, const IIdentityChecker& identityChecker, IConnectionManager& connection_manager)
     : m_ourKeys(ourKeys)
     , m_identityChecker(identityChecker)
-    , m_connectionManager(m_connectionManager)
+    , m_connectionManager(connection_manager)
 {
     connect(this, &QTcpServer::newConnection, this, &EncryptedServer::newConnection);
 }
@@ -51,7 +51,7 @@ void EncryptedServer::newConnection()
 }
 
 
-void EncryptedServer::validateTheirsPublicKey(IEncryptedConnection* connection)
+void EncryptedServer::validateTheirsPublicKey(IEncryptedConnection *)
 {
 
 }

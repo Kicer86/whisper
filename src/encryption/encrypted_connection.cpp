@@ -101,7 +101,7 @@ void EncryptedConnection::sendPublicKey()
 
     /// @todo Use some nice tool for sending data instead of sending raw bytes.
     ///       It would be nice to aboif little/big endian problems
-    const quint16 public_key_size = keyByteArraySize;
+    const quint16 public_key_size = static_cast<quint16>(keyByteArraySize);
     const char* public_key_size_chars = utils::binary_cast<const char[2]>(public_key_size);
 
     m_socket->write(public_key_size_chars, 2);
@@ -119,7 +119,7 @@ void EncryptedConnection::sendSymmetricKey()
     Botan::PK_Encryptor_EME enc(*m_theirsPublicKey, rng, "EME1(SHA-256)");
     std::vector<uint8_t> encrypted_key = enc.encrypt(m_symmetricKey, rng);
 
-    const quint16 encrypted_message_size = encrypted_key.size();
+    const quint16 encrypted_message_size = static_cast<quint16>(encrypted_key.size());
     const char* encrypted_message_size_chars = utils::binary_cast<const char[2]>(encrypted_message_size);
 
     m_socket->write(encrypted_message_size_chars, 2);
@@ -239,6 +239,11 @@ void EncryptedConnection::readyRead()
                 case ConnectionEstablished:
                 {
                     throw unexpected_data{};
+                    break;
+                }
+
+                case Ready:
+                {
                     break;
                 }
             }
