@@ -2,7 +2,7 @@
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(OpenLibrary 2.4 REQUIRED COMPONENTS utils_qt)
-find_package(OpenSSL 1.1.1 REQUIRED)
+find_package(Botan 2.12 REQUIRED)
 
 add_executable(whisper
                 encryption/encrypted_client.cpp
@@ -16,6 +16,8 @@ add_executable(whisper
                 encryption/identity.hpp
                 encryption/iencrypted_connection.hpp
                 encryption/iidentity_checker.hpp
+                encryption/iencryption_primitives_provider.hpp
+                encryption/utils.hpp
                 connection_manager.cpp
                 connection_manager.hpp
                 identity_checker.cpp
@@ -39,6 +41,7 @@ target_include_directories(whisper
                                 ${Qt5Widgets_INCLUDE_DIRS}
                                 ${Qt5Netwok_INCLUDE_DIRS}
                                 ${OPENLIBRARY_INCLUDE_DIRS}
+                                ${BOTAN_INCLUDE_DIRS}
 )
 
 target_link_libraries(whisper
@@ -46,7 +49,7 @@ target_link_libraries(whisper
                         Qt5::Widgets
                         Qt5::Network
                         OpenLibrary::utils_qt
-                        OpenSSL::Crypto
+                        ${BOTAN_LIBRARIES}
 )
 
 

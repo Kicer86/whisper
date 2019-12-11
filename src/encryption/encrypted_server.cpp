@@ -24,8 +24,8 @@
 #include "iconnection_manager.hpp"
 
 
-EncryptedServer::EncryptedServer(const QSslKey& oursPublicKey, const IIdentityChecker& identityChecker, IConnectionManager& connection_manager)
-    : m_oursPublicKey(oursPublicKey)
+EncryptedServer::EncryptedServer(const IEncryptionPrimitivesProvider* ourKeys, const IIdentityChecker& identityChecker, IConnectionManager& connection_manager)
+    : m_ourKeys(ourKeys)
     , m_identityChecker(identityChecker)
     , m_connectionManager(m_connectionManager)
 {
@@ -44,9 +44,8 @@ void EncryptedServer::newConnection()
     while(hasPendingConnections())
     {
         QTcpSocket* socket = nextPendingConnection();
-        socket->setParent(nullptr);                     // EncryptedConnection will take it
 
-        auto encrypted_connection = std::make_unique<EncryptedConnection>(m_oursPublicKey, socket);
+        auto encrypted_connection = std::make_unique<EncryptedConnection>(m_ourKeys, socket);
         m_waitingForApproval.push_back(std::move(encrypted_connection));
     }
 }

@@ -3,13 +3,14 @@
 #define IENCRYPTED_CONNECTION_HPP_INCLUDED
 
 #include <QSslKey>
+#include <botan/pk_keys.h>
 
 
 struct IEncryptedConnection
 {
     virtual ~IEncryptedConnection() = default;
 
-    virtual QSslKey getTheirsPublicKey() const = 0;
+    virtual const Botan::Public_Key* getTheirsPublicKey() const = 0;
 };
 
 

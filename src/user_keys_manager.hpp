@@ -19,23 +19,29 @@
 #define USERKEYSMANAGER_HPP
 
 #include <QString>
-#include <QSslKey>
+#include <botan/pk_keys.h>
+
+#include "encryption/iencryption_primitives_provider.hpp"
 
 /**
  * @brief Class for managing user's cryptographic keys
  */
-class UserKeysManager
+class UserKeysManager: public IEncryptionPrimitivesProvider
 {
     public:
         UserKeysManager(const QString& keys_dir);
+        ~UserKeysManager();
 
         bool privateKeyExists() const;
         bool publicKeyExists() const;
         bool generateKeysPair() const;
 
-        QSslKey ourPublicKey() const;
+        std::unique_ptr<Botan::Public_Key> ourPublicKey() const override;
+        std::unique_ptr<Botan::Private_Key> ourPrivateKey() const override;
+        Botan::RandomNumberGenerator& randomGenerator() const override;
 
     private:
+        const std::unique_ptr<Botan::RandomNumberGenerator> m_randomGenerator;
         const QString m_keysDir;
 
         QString privateKeyPath() const;

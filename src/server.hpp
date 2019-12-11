@@ -20,16 +20,20 @@
 #define SERVER_HPP
 
 #include <QObject>
+#include <botan/pk_keys.h>
 
 #include "encryption/encrypted_server.hpp"
 #include "identity_checker.hpp"
+
+struct IEncryptionPrimitivesProvider;
+
 
 class Server final: public QObject
 {
         Q_OBJECT
 
     public:
-        Server(const QSslKey& oursPublicKey, IConnectionManager& connection_manager, quint16 port, QObject * = nullptr);
+        Server(const IEncryptionPrimitivesProvider* ourKeys, IConnectionManager& connection_manager, quint16 port, QObject * = nullptr);
         ~Server();
 
         void start();

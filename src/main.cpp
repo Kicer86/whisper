@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 
     UserKeysManager manager(configDir + "/user_keys");
 
-    /// @todo handle this one properly (like as user what to do when one file is missing
+    /// @todo handle this one properly (like as user what to do when one file is missing)
     if (manager.privateKeyExists() == false || manager.publicKeyExists() == false)
         manager.generateKeysPair();
 
@@ -44,12 +44,11 @@ int main(int argc, char** argv)
 
     ConnectionManager connectionManager;
 
-    const QSslKey oursPublicKey = manager.ourPublicKey();
-    Server server(oursPublicKey, connectionManager, configuration.getEntry("port").toInt());
+    Server server(&manager, connectionManager, configuration.getEntry("port").toInt());
     server.start();
 
     // temporary debug code
-    EncryptedClient client(oursPublicKey, connectionManager);
+    EncryptedClient client(&manager, connectionManager);
     if (configuration.getEntry("port").toInt() != 1234)
         client.makeConnection("localhost", 1234);
 

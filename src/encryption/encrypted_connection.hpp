@@ -21,8 +21,9 @@
 
 #include "iencrypted_connection.hpp"
 
-#include <memory>
 #include <QTcpSocket>
+
+struct IEncryptionPrimitivesProvider;
 
 /**
  * @brief representation of encrypted connection
@@ -33,34 +34,47 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         Q_OBJECT
 
     public:
-        EncryptedConnection(const QSslKey& oursPublicKey, const QString& host, quint16 port);
-        EncryptedConnection(const QSslKey& oursPublicKey, QTcpSocket *);
+        EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, const QString& host, quint16 port);
+        EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, QTcpSocket *);
+        ~EncryptedConnection();
 
-        QSslKey getTheirsPublicKey() const override;
+        const Botan::Public_Key* getTheirsPublicKey() const override;
 
     private:
-        QSslKey m_oursPublicKey;
-        QSslKey m_theirsPublicKey;
-        std::unique_ptr<QTcpSocket> m_socket;
+        const IEncryptionPrimitivesProvider* m_ourKeys;
+        std::unique_ptr<Botan::Public_Key> m_theirsPublicKey;
+        std::vector<unsigned char> m_symmetricKey;
+        QTcpSocket* m_socket;
+
+        struct not_enouth_data: std::exception {};
+        struct unexpected_data: std::exception {};
 
         enum State
         {
-            WaitForConnectionValidation,
-            ValidateIncomingConnection,
+            WaitForPublicKeyFromHost,
+            AcceptClient,
+            WaitForSymmetricKeyFromHost,
             ConnectionEstablished,
+            Ready,
         } m_state;
 
-        void connectToSocketSignals();
-        void sendPublicKey();
+        EncryptedConnection(const IEncryptionPrimitivesProvider *, State);
 
-        bool readTheirsPublicKey();
+        void connectToSocketSignals();
+
+        void sendPublicKey();
+        void sendSymmetricKey();
+        void readTheirsPublicKey();
+        void readSymmetricKey();
+        QByteArray readDataWithSizeHeader();
 
         void socketStateChanged(QAbstractSocket::SocketState socketState);
         void socketError(QAbstractSocket::SocketError);
         void readyRead();
+        void disconnected();
 
     signals:
-        void gotTheirsPublicKey(IEncryptedConnection *);
+        void connectionEstablished(IEncryptedConnection *);
 };
 
 
