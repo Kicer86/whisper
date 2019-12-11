@@ -52,9 +52,9 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
 
         enum State
         {
-            WaitForConnectionValidation,
-            ValidateIncomingConnection,
-            WaitForSymmetricKey,
+            WaitForPublicKeyFromHost,
+            AcceptClient,
+            WaitForSymmetricKeyFromHost,
             ConnectionEstablished,
         } m_state;
 

@@ -31,7 +31,7 @@
 //         this would make UT possible.
 
 EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, const QString& host, quint16 port)
-    : EncryptedConnection(ourKeys, WaitForConnectionValidation)
+    : EncryptedConnection(ourKeys, WaitForPublicKeyFromHost)
 {
     m_socket = new QTcpSocket(this);
     connectToSocketSignals();
@@ -44,7 +44,7 @@ EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ou
 
 
 EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, QTcpSocket* socket)
-    : EncryptedConnection(ourKeys, ValidateIncomingConnection)
+    : EncryptedConnection(ourKeys, AcceptClient)
 {
     m_socket = socket;
     m_socket->setParent(this);
@@ -199,7 +199,7 @@ void EncryptedConnection::readyRead()
             switch (m_state)
             {
                 // server side only
-                case ValidateIncomingConnection:
+                case AcceptClient:
                 {
                     readTheirsPublicKey();
                     sendPublicKey();
@@ -211,17 +211,17 @@ void EncryptedConnection::readyRead()
                 }
 
                 // client side only
-                case WaitForConnectionValidation:
+                case WaitForPublicKeyFromHost:
                 {
                     readTheirsPublicKey();
 
-                    m_state = WaitForSymmetricKey;
+                    m_state = WaitForSymmetricKeyFromHost;
 
                     std::cout << "accepted by server\n";
                     break;
                 }
 
-                case WaitForSymmetricKey:
+                case WaitForSymmetricKeyFromHost:
                 {
                     readSymmetricKey();
 
