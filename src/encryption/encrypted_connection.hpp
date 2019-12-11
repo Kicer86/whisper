@@ -43,7 +43,6 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
     private:
         const IEncryptionPrimitivesProvider* m_ourKeys;
         std::unique_ptr<Botan::Public_Key> m_theirsPublicKey;
-        static constexpr int m_symmetricKeySize = 32;
         std::vector<unsigned char> m_symmetricKey;
         QTcpSocket* m_socket;
 

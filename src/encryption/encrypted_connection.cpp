@@ -30,6 +30,13 @@
 /// @todo: instead of passing or creating TcpSocket here, a QIODevice should be passed.
 //         this would make UT possible.
 
+
+namespace
+{
+    constexpr int SymmetricKeySize = 32;
+}
+
+
 EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, const QString& host, quint16 port)
     : EncryptedConnection(ourKeys, WaitForPublicKeyFromHost)
 {
@@ -69,7 +76,7 @@ const Botan::Public_Key* EncryptedConnection::getTheirsPublicKey() const
 
 EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, State state)
     : m_ourKeys(ourKeys)
-    , m_symmetricKey(m_symmetricKeySize)
+    , m_symmetricKey(SymmetricKeySize)
     , m_socket(nullptr)
     , m_state(state)
 {
@@ -106,7 +113,7 @@ void EncryptedConnection::sendSymmetricKey()
 {
     Botan::RandomNumberGenerator& rng = m_ourKeys->randomGenerator();
 
-    for(int i = 0; i < m_symmetricKeySize; i++)
+    for(int i = 0; i < SymmetricKeySize; i++)
         m_symmetricKey[i] = rng.next_byte();
 
     Botan::PK_Encryptor_EME enc(*m_theirsPublicKey, rng, "EME1(SHA-256)");
