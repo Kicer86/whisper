@@ -202,8 +202,6 @@ void EncryptedConnection::readyRead()
                 case ValidateIncomingConnection:
                 {
                     readTheirsPublicKey();
-
-                    /// @todo: validate connection
                     sendPublicKey();
                     sendSymmetricKey();
                     m_state = ConnectionEstablished;
@@ -217,7 +215,6 @@ void EncryptedConnection::readyRead()
                 {
                     readTheirsPublicKey();
 
-                    /// @todo: validate connection
                     m_state = WaitForSymmetricKey;
 
                     std::cout << "accepted by server\n";
