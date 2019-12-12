@@ -1,3 +1,6 @@
 [submodule "cmake_modules"]
 	path = cmake_modules
 	url = https://github.com/Kicer86/cmake_modules
+[submodule "QtAndroidCMake"]
+	path = QtAndroidCMake
+	url = https://github.com/OlivierLDff/QtAndroidCMake.git
