@@ -65,5 +65,6 @@ set_target_properties(whisper PROPERTIES AUTOMOC TRUE)
 if(ANDROID)
     include(${CMAKE_SOURCE_DIR}/QtAndroidCMake/AddQtAndroidApk.cmake)
     add_qt_android_apk(whisper_apk whisper
+        DEPENDS ${BOTAN_LIBRARIES} OpenLibrary::utils_qt
     )
 endif()
