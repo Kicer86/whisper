@@ -42,3 +42,11 @@ Not required but listed for reference:
 
 Detailed information:
 https://github.com/OlivierLDff/QtAndroidCMake/blob/master/readme.md
+
+
+Botan build:
+export CXX=/opt/android-ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi22-clang++
+./configure.py --os=android --cc=clang --cpu=armv7
+
+OpenLibrary build:
+use android-armv7a-eabi-cmake /path/to/source/dir to configure, build and install openlibrary
