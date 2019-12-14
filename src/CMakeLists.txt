@@ -60,3 +60,10 @@ target_link_libraries(whisper
 
 
 set_target_properties(whisper PROPERTIES AUTOMOC TRUE)
+
+
+if(ANDROID)
+    include(${CMAKE_SOURCE_DIR}/QtAndroidCMake/AddQtAndroidApk.cmake)
+    add_qt_android_apk(whisper_apk whisper
+    )
+endif()
