@@ -24,9 +24,10 @@ android-armv7a-eabi-qt5
 
 cmake parameters to setup android environment:
 -DCMAKE_TOOLCHAIN_FILE:PATH=/opt/android-ndk/build/cmake/android.toolchain.cmake
+-DANDROID_STL=c++_shared
 
 Or use
-android-armv7a-eabi-cmake /path/to/source/dir
+android-armv7a-eabi-cmake /path/to/source/dir -DANDROID_STL=c++_shared
 
 Not required but listed for reference:
 -DANDROID_ABI:STRING=armeabi-v7a
