@@ -49,3 +49,9 @@ QString UserManager::address(const UserId&) const
 {
     return QString();
 }
+
+
+QByteArray UserManager::publicKey(const UserId&) const
+{
+    return QByteArray();
+}
