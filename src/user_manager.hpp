@@ -28,9 +28,9 @@ class UserManager final: public IUserManager
         UserManager();
         ~UserManager();
 
-        QVector<UserId> listUsers() const;
-        QString name(const UserId &) const;
-        QString address(const UserId &) const;
+        QVector<UserId> listUsers() const override;
+        QString name(const UserId &) const override;
+        QString address(const UserId &) const override;
 };
 
 #endif // USERMANAGER_HPP
