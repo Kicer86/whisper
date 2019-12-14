@@ -1,0 +1,53 @@
+Arch packages required for android build:
+
+android-ndk
+android-environment
+android-pkg-config
+android-armv7a-eabi-zlib
+java-environment-common
+java-runtime-common
+jre8-openjdk
+jre8-openjdk-headless
+ant
+swt
+android-sdk-build-tools
+android-sdk-platform-tools
+android-configure
+android-armv7a-eabi-libpng
+android-cmake
+android-armv7a-eabi-libjpeg-turbo
+android-armv7a-eabi-openssl
+jdk8-openjdk
+android-sdk
+android-platform-22
+android-armv7a-eabi-qt5
+
+cmake parameters to setup android environment:
+-DCMAKE_TOOLCHAIN_FILE:PATH=/opt/android-ndk/build/cmake/android.toolchain.cmake
+-DANDROID_STL=c++_shared
+
+Or use
+android-armv7a-eabi-cmake /path/to/source/dir -DANDROID_STL=c++_shared
+
+Not required but listed for reference:
+-DANDROID_ABI:STRING=armeabi-v7a
+-DANDROID_NATIVE_API_LEVEL:STRING=21
+-DANDROID_NDK:PATH=/opt/android-ndk
+-DANDROID_STL:STRING=c++_shared
+-DCMAKE_BUILD_TYPE:STRING=Debug
+-DCMAKE_CXX_COMPILER:STRING=/opt/android-ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++
+-DCMAKE_C_COMPILER:STRING=/opt/android-ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/clang
+-DCMAKE_FIND_ROOT_PATH:STRING=/opt/android-libs/armv7a-eabi
+-DCMAKE_PREFIX_PATH:STRING=/opt/android-libs/armv7a-eabi
+-DQT_QMAKE_EXECUTABLE:STRING=/opt/android-libs/armv7a-eabi/bin/qmake
+
+Detailed information:
+https://github.com/OlivierLDff/QtAndroidCMake/blob/master/readme.md
+
+
+Botan build:
+export CXX=/opt/android-ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi22-clang++
+./configure.py --os=android --cc=clang --cpu=armv7
+
+OpenLibrary build:
+use android-armv7a-eabi-cmake /path/to/source/dir to configure, build and install openlibrary
