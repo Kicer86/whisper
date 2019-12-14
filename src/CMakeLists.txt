@@ -4,7 +4,7 @@ find_package(Qt5Network REQUIRED)
 find_package(OpenLibrary 2.4 REQUIRED COMPONENTS utils_qt)
 find_package(Botan 2.12 REQUIRED)
 
-add_executable(whisper
+set(WHISPER_SOURCES
                 encryption/encrypted_client.cpp
                 encryption/encrypted_client.hpp
                 encryption/encrypted_connection.cpp
@@ -35,6 +35,12 @@ add_executable(whisper
                 user_manager.cpp
                 user_manager.hpp
 )
+
+if (ANDROID)
+    add_library(whisper SHARED ${WHISPER_SOURCES})
+else()
+    add_executable(whisper ${WHISPER_SOURCES})
+endif()
 
 target_include_directories(whisper
                             SYSTEM PRIVATE
