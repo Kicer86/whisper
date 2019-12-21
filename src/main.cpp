@@ -8,6 +8,7 @@
 
 #include "main_window.hpp"
 #include "user_keys_manager.hpp"
+#include "user_manager.hpp"
 #include "server.hpp"
 #include "encryption/encrypted_client.hpp"
 #include "connection_manager.hpp"
@@ -35,6 +36,7 @@ int main(int argc, char** argv)
     configuration.setDefaultValue("port", 1234);
 
     UserKeysManager manager(configDir + "/user_keys");
+    UserManager usersManager(configuration);
 
     /// @todo handle this one properly (like as user what to do when one file is missing)
     if (manager.privateKeyExists() == false || manager.publicKeyExists() == false)
