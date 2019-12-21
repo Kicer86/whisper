@@ -29,6 +29,14 @@ namespace
 }
 
 
+UserManager::User::User(const QString& n, const QString& h, const QByteArray& p)
+    : name(n)
+    , host(h)
+    , pkey(p)
+{
+}
+
+
 UserManager::UserManager(IConfiguration& config)
     : m_config(config)
 {
@@ -46,25 +54,31 @@ QVector<UserId> UserManager::listUsers() const
 {
     QVector<UserId> result;
 
+    for(auto it = m_users.cbegin(); it != m_users.cend(); ++it)
+        result.append(it->first);
+
     return result;
 }
 
 
-QString UserManager::name(const UserId&) const
+QString UserManager::name(const UserId& id) const
 {
-    return QString();
+    auto it = m_users.find(id);
+    return it == m_users.cend()? QString(): it->second.name;
 }
 
 
-QString UserManager::address(const UserId&) const
+QString UserManager::address(const UserId& id) const
 {
-    return QString();
+    auto it = m_users.find(id);
+    return it == m_users.cend()? QString(): it->second.host;
 }
 
 
-QByteArray UserManager::publicKey(const UserId&) const
+QByteArray UserManager::publicKey(const UserId& id) const
 {
-    return QByteArray();
+    auto it = m_users.find(id);
+    return it == m_users.cend()? QByteArray(): it->second.pkey;
 }
 
 
@@ -75,7 +89,9 @@ void UserManager::load()
     for (const QString& user: users)
     {
         const QString userName = m_config.getEntry(QString("%1::%2::name").arg(users_config_node).arg(user)).toString();
-        const QString publicKey = m_config.getEntry(QString("%1::%2::pkey").arg(users_config_node).arg(user)).toString();
+        const QByteArray publicKey = m_config.getEntry(QString("%1::%2::pkey").arg(users_config_node).arg(user)).toByteArray();
         const QString lastHost = m_config.getEntry(QString("%1::%2::last_host").arg(users_config_node).arg(user)).toString();
+
+        m_users.emplace(m_userNextId++, User(userName, lastHost, publicKey));
     }
 }

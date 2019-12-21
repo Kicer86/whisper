@@ -21,6 +21,8 @@
 
 #include "iuser_manager.hpp"
 
+#include <map>
+
 struct IConfiguration;
 
 class UserManager final: public IUserManager
@@ -35,7 +37,18 @@ class UserManager final: public IUserManager
         QByteArray publicKey(const UserId &) const override;
 
     private:
+        struct User
+        {
+            QString name;
+            QString host;
+            QByteArray pkey;
+
+            User(const QString &, const QString &, const QByteArray &);
+        };
+
+        std::map<UserId, User> m_users;
         IConfiguration& m_config;
+        UserId m_userNextId;
 
         void load();
 };
