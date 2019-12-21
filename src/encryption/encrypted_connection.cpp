@@ -17,7 +17,6 @@
 
 #include "encrypted_connection.hpp"
 
-#include <iostream>
 #include <botan/data_src.h>
 #include <botan/pubkey.h>
 #include <botan/x509_key.h>
@@ -188,13 +187,13 @@ QByteArray EncryptedConnection::readDataWithSizeHeader()
 
 void EncryptedConnection::socketStateChanged(QAbstractSocket::SocketState socketState)
 {
-    std::cout << "client socket state changed to: " << socketState << "\n";
+    qDebug() << "client socket state changed to: " << socketState;
 }
 
 
-void EncryptedConnection::socketError(QAbstractSocket::SocketError)
+void EncryptedConnection::socketError(QAbstractSocket::SocketError error)
 {
-    std::cout << "client socket error: " << m_socket->errorString().toStdString() << "\n";
+    qDebug() << "client socket error" << error;
 }
 
 
@@ -213,7 +212,7 @@ void EncryptedConnection::readyRead()
                     sendSymmetricKey();
                     m_state = ConnectionEstablished;
 
-                    std::cout << "client accepted\n";
+                    qDebug() << "client accepted";
                     break;
                 }
 
@@ -224,7 +223,7 @@ void EncryptedConnection::readyRead()
 
                     m_state = WaitForSymmetricKeyFromHost;
 
-                    std::cout << "accepted by server\n";
+                    qDebug() << "accepted by server";
                     break;
                 }
 
@@ -261,5 +260,5 @@ void EncryptedConnection::readyRead()
 
 void EncryptedConnection::disconnected()
 {
-    std::cout << "socket disconnected\n";
+    qDebug() << "socket disconnected";
 }

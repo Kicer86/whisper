@@ -8,6 +8,7 @@
 
 #include "main_window.hpp"
 #include "user_keys_manager.hpp"
+#include "user_manager.hpp"
 #include "server.hpp"
 #include "encryption/encrypted_client.hpp"
 #include "connection_manager.hpp"
@@ -35,6 +36,7 @@ int main(int argc, char** argv)
     configuration.setDefaultValue("port", 1234);
 
     UserKeysManager manager(configDir + "/user_keys");
+    UserManager usersManager(configuration);
 
     /// @todo handle this one properly (like as user what to do when one file is missing)
     if (manager.privateKeyExists() == false || manager.publicKeyExists() == false)
@@ -48,10 +50,16 @@ int main(int argc, char** argv)
     Server server(&manager, connectionManager, port);
     server.start();
 
-    // temporary debug code
     EncryptedClient client(&manager, connectionManager);
-    if (configuration.getEntry("port").toInt() != 1234)
-        client.makeConnection("localhost", 1234);
+
+    auto users = usersManager.listUsers();
+
+    for (const UserId& user: users)
+    {
+        const std::pair<QString, quint16> address = usersManager.address(user);
+
+        client.makeConnection(address.first, address.second);
+    }
 
     MainWindow main_window;
     main_window.show();

@@ -8,7 +8,8 @@ struct IUserManager
 {
     virtual ~IUserManager() = default;
 
-    QVector<UserId> listUsers() const;
-    QString name(const UserId &) const;
-    QString address(const UserId &) const;
+    virtual QVector<UserId> listUsers() const = 0;
+    virtual QString name(const UserId &) const = 0;
+    virtual std::pair<QString, quint16> address(const UserId &) const = 0;
+    virtual QByteArray publicKey(const UserId &) const = 0;
 };

@@ -21,16 +21,37 @@
 
 #include "iuser_manager.hpp"
 
+#include <map>
+
+struct IConfiguration;
 
 class UserManager final: public IUserManager
 {
     public:
-        UserManager();
+        UserManager(IConfiguration &);
         ~UserManager();
 
-        QVector<UserId> listUsers() const;
-        QString name(const UserId &) const;
-        QString address(const UserId &) const;
+        QVector<UserId> listUsers() const override;
+        QString name(const UserId &) const override;
+        std::pair<QString, quint16> address(const UserId &) const override;
+        QByteArray publicKey(const UserId &) const override;
+
+    private:
+        struct User
+        {
+            QString name;
+            QString host;
+            QByteArray pkey;
+            quint16 port;
+
+            User(const QString &, const QString &, quint16, const QByteArray &);
+        };
+
+        std::map<UserId, User> m_users;
+        IConfiguration& m_config;
+        UserId m_userNextId;
+
+        void load();
 };
 
 #endif // USERMANAGER_HPP
