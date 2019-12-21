@@ -50,10 +50,17 @@ int main(int argc, char** argv)
     Server server(&manager, connectionManager, port);
     server.start();
 
-    // temporary debug code
     EncryptedClient client(&manager, connectionManager);
-    if (configuration.getEntry("port").toInt() != 1234)
-        client.makeConnection("localhost", 1234);
+
+    auto users = usersManager.listUsers();
+
+    for (const UserId& user: users)
+    {
+        const QString address = usersManager.address(user);
+        const QStringList addressSplited = address.split(":");
+
+        client.makeConnection(addressSplited.front(), addressSplited.back().toShort());
+    }
 
     MainWindow main_window;
     main_window.show();
