@@ -18,10 +18,21 @@
 
 #include "user_manager.hpp"
 
+#include <QStringList>
+#include <QVariant>
+#include <OpenLibrary/utils_qt/iconfiguration.hpp>
 
-UserManager::UserManager()
+
+namespace
 {
+    const QString users_config_node("users");
+}
 
+
+UserManager::UserManager(IConfiguration& config)
+    : m_config(config)
+{
+    load();
 }
 
 
@@ -54,4 +65,17 @@ QString UserManager::address(const UserId&) const
 QByteArray UserManager::publicKey(const UserId&) const
 {
     return QByteArray();
+}
+
+
+void UserManager::load()
+{
+    const QStringList users = m_config.getSubEntries(users_config_node);
+
+    for (const QString& user: users)
+    {
+        const QString userName = m_config.getEntry(QString("%1::%2::name").arg(users_config_node).arg(user)).toString();
+        const QString publicKey = m_config.getEntry(QString("%1::%2::pkey").arg(users_config_node).arg(user)).toString();
+        const QString lastHost = m_config.getEntry(QString("%1::%2::last_host").arg(users_config_node).arg(user)).toString();
+    }
 }

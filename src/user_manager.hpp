@@ -21,17 +21,23 @@
 
 #include "iuser_manager.hpp"
 
+struct IConfiguration;
 
 class UserManager final: public IUserManager
 {
     public:
-        UserManager();
+        UserManager(IConfiguration &);
         ~UserManager();
 
         QVector<UserId> listUsers() const override;
         QString name(const UserId &) const override;
         QString address(const UserId &) const override;
         QByteArray publicKey(const UserId &) const override;
+
+    private:
+        IConfiguration& m_config;
+
+        void load();
 };
 
 #endif // USERMANAGER_HPP
