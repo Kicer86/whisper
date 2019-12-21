@@ -56,10 +56,9 @@ int main(int argc, char** argv)
 
     for (const UserId& user: users)
     {
-        const QString address = usersManager.address(user);
-        const QStringList addressSplited = address.split(":");
+        const std::pair<QString, quint16> address = usersManager.address(user);
 
-        client.makeConnection(addressSplited.front(), addressSplited.back().toShort());
+        client.makeConnection(address.first, address.second);
     }
 
     MainWindow main_window;

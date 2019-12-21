@@ -33,7 +33,7 @@ class UserManager final: public IUserManager
 
         QVector<UserId> listUsers() const override;
         QString name(const UserId &) const override;
-        QString address(const UserId &) const override;
+        std::pair<QString, quint16> address(const UserId &) const override;
         QByteArray publicKey(const UserId &) const override;
 
     private:
@@ -42,8 +42,9 @@ class UserManager final: public IUserManager
             QString name;
             QString host;
             QByteArray pkey;
+            quint16 port;
 
-            User(const QString &, const QString &, const QByteArray &);
+            User(const QString &, const QString &, quint16, const QByteArray &);
         };
 
         std::map<UserId, User> m_users;
