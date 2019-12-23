@@ -73,7 +73,7 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         void socketError(QAbstractSocket::SocketError);
         void readyRead();
         void disconnected();
-        void closeConnection();
+        void closeConnection() override;
 
     signals:
         void connectionEstablished(IEncryptedConnection *);
