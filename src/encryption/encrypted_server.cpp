@@ -63,6 +63,8 @@ void EncryptedServer::connectionEstablished(IEncryptedConnection* connection)
 
     if (it == m_waitingForApproval.end())       // weird - we did not expect this to happen
     {
+        qCritical() << "unexpected establishment";
+
         connection->closeConnection();
         m_waitingForApproval.erase(it);
     }
