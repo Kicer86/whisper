@@ -34,6 +34,7 @@ set(WHISPER_SOURCES
                 user_list_widget.hpp
                 user_manager.cpp
                 user_manager.hpp
+                utils.hpp
 )
 
 if (ANDROID)
