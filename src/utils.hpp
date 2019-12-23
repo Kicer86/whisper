@@ -2,6 +2,10 @@
 #ifndef UTILS_HPP_INCLUDED
 #define UTILS_HPP_INCLUDED
 
+
+namespace utils
+{
+
 // https://stackoverflow.com/a/18940595/1749713
 template<class T>
 struct pointer_comp {
@@ -34,9 +38,6 @@ struct pointer_comp {
   }
 };
 
-
-namespace utils
-{
     template<typename T, typename F>
     constexpr T& binary_cast(F& from)
     {
