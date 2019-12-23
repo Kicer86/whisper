@@ -24,7 +24,7 @@
 #include <botan/auto_rng.h>
 
 #include "iencryption_primitives_provider.hpp"
-#include "utils.hpp"
+#include "../utils.hpp"
 
 /// @todo: instead of passing or creating TcpSocket here, a QIODevice should be passed.
 //         this would make UT possible.

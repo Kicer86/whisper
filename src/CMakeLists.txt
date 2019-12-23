@@ -17,7 +17,6 @@ set(WHISPER_SOURCES
                 encryption/iencrypted_connection.hpp
                 encryption/iidentity_checker.hpp
                 encryption/iencryption_primitives_provider.hpp
-                encryption/utils.hpp
                 connection_manager.cpp
                 connection_manager.hpp
                 identity_checker.cpp
