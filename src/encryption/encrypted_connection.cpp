@@ -208,6 +208,7 @@ void EncryptedConnection::socketError(QAbstractSocket::SocketError error)
     {
         case QAbstractSocket::HostNotFoundError:
         case QAbstractSocket::ConnectionRefusedError:
+        case QAbstractSocket::RemoteHostClosedError:
             closeConnection();
             break;
 
