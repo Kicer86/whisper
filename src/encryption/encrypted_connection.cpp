@@ -274,8 +274,16 @@ void EncryptedConnection::readyRead()
         }
     }
     catch(const not_enouth_data &) {}       /// this is not failure, wait for more
-    catch(const unexpected_data &) {}       /// some error in protocol, @todo kill connection
-    catch(const protocol_error &) {}        /// something unexpected happend, @todo kill connection
+    catch(const unexpected_data &)          /// error in protocol - unexpected data
+    {
+        qCritical() << "Unexpected data in protocol";
+        closeConnection();
+    }
+    catch(const protocol_error &)           /// something unexpected happend, @todo kill connection
+    {
+        qCritical() << "Broken protocol";
+        closeConnection();
+    }
 }
 
 
