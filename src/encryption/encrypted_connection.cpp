@@ -65,7 +65,13 @@ EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ou
 
 EncryptedConnection::~EncryptedConnection()
 {
-    closeConnection();
+    assert(m_socket->state() == QAbstractSocket::UnconnectedState);  // are we killing alive connection?!
+
+    if (m_socket->state() != QAbstractSocket::UnconnectedState)
+    {
+        m_socket->disconnect(this);    // stop listening, we are getting destroyed
+        closeConnection();
+    }
 }
 
 
@@ -276,11 +282,14 @@ void EncryptedConnection::readyRead()
 void EncryptedConnection::disconnected()
 {
     qDebug() << "socket disconnected";
+
+    emit connectionClosed(this);
 }
 
 
 void EncryptedConnection::closeConnection()
 {
+    qDebug() << "closing connection gracefully";
     m_socket->disconnectFromHost();
 
     m_socket->state() == QAbstractSocket::UnconnectedState || m_socket->waitForDisconnected(1000);
