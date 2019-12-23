@@ -50,12 +50,13 @@ EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ou
 
 
 EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, QTcpSocket* socket)
-    : EncryptedConnection(ourKeys, AcceptClient)
+    : EncryptedConnection(ourKeys, WaitForPublicKeyFromHost)
 {
     m_socket = socket;
     m_socket->setParent(this);
-
     connectToSocketSignals();
+
+    sendPublicKey();
 }
 
 
@@ -75,10 +76,15 @@ const Botan::Public_Key* EncryptedConnection::getTheirsPublicKey() const
 
 EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, State state)
     : m_ourKeys(ourKeys)
-    , m_symmetricKey(SymmetricKeySize)
+    , m_symmetricKeyPart(SymmetricKeySize)
     , m_socket(nullptr)
     , m_state(state)
 {
+    // prepare part of symmetric key
+    Botan::RandomNumberGenerator& rng = m_ourKeys->randomGenerator();
+
+    for(int i = 0; i < SymmetricKeySize; i++)
+        m_symmetricKeyPart[i] = rng.next_byte();
 }
 
 
@@ -110,13 +116,10 @@ void EncryptedConnection::sendPublicKey()
 
 void EncryptedConnection::sendSymmetricKey()
 {
+    // send our part of symmetric key
     Botan::RandomNumberGenerator& rng = m_ourKeys->randomGenerator();
-
-    for(int i = 0; i < SymmetricKeySize; i++)
-        m_symmetricKey[i] = rng.next_byte();
-
     Botan::PK_Encryptor_EME enc(*m_theirsPublicKey, rng, "EME1(SHA-256)");
-    std::vector<uint8_t> encrypted_key = enc.encrypt(m_symmetricKey, rng);
+    std::vector<uint8_t> encrypted_key = enc.encrypt(m_symmetricKeyPart, rng);
 
     const quint16 encrypted_message_size = static_cast<quint16>(encrypted_key.size());
     const char* encrypted_message_size_chars = utils::binary_cast<const char[2]>(encrypted_message_size);
@@ -151,6 +154,13 @@ void EncryptedConnection::readSymmetricKey()
     std::copy(decrypted_symmetric_key.cbegin(),
                 decrypted_symmetric_key.cend(),
                 std::back_inserter(m_symmetricKey));
+
+    if (m_symmetricKey.size() != m_symmetricKeyPart.size())
+        throw protocol_error{};
+
+    // xor received key with out part
+    for(unsigned int i = 0; i < m_symmetricKey.size(); i++)
+        m_symmetricKey[i] ^= m_symmetricKeyPart[i];
 }
 
 
@@ -204,32 +214,23 @@ void EncryptedConnection::readyRead()
         while (m_socket->bytesAvailable())
             switch (m_state)
             {
-                // server side only
-                case AcceptClient:
-                {
-                    readTheirsPublicKey();
-                    sendPublicKey();
-                    sendSymmetricKey();
-                    m_state = ConnectionEstablished;
-
-                    qDebug() << "client accepted";
-                    break;
-                }
-
-                // client side only
                 case WaitForPublicKeyFromHost:
                 {
                     readTheirsPublicKey();
+                    sendSymmetricKey();
 
                     m_state = WaitForSymmetricKeyFromHost;
 
-                    qDebug() << "accepted by server";
+                    qDebug() << "got public key";
+                    qDebug() << "sending symetric key";
                     break;
                 }
 
                 case WaitForSymmetricKeyFromHost:
                 {
                     readSymmetricKey();
+
+                    qDebug() << "got symmetric key";
 
                     m_state = ConnectionEstablished;
                     break;
@@ -255,6 +256,7 @@ void EncryptedConnection::readyRead()
     }
     catch(const not_enouth_data &) {}       /// this is not failure, wait for more
     catch(const unexpected_data &) {}       /// some error in protocol, @todo kill connection
+    catch(const protocol_error &) {}        /// something unexpected happend, @todo kill connection
 }
 
 

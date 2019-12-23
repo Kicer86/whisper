@@ -43,16 +43,17 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
     private:
         const IEncryptionPrimitivesProvider* m_ourKeys;
         std::unique_ptr<Botan::Public_Key> m_theirsPublicKey;
+        std::vector<unsigned char> m_symmetricKeyPart;
         std::vector<unsigned char> m_symmetricKey;
         QTcpSocket* m_socket;
 
         struct not_enouth_data: std::exception {};
         struct unexpected_data: std::exception {};
+        struct protocol_error: std::exception {};
 
         enum State
         {
             WaitForPublicKeyFromHost,
-            AcceptClient,
             WaitForSymmetricKeyFromHost,
             ConnectionEstablished,
             Ready,
