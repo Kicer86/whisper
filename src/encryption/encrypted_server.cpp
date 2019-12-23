@@ -46,7 +46,13 @@ void EncryptedServer::newConnection()
         QTcpSocket* socket = nextPendingConnection();
 
         auto encrypted_connection = std::make_unique<EncryptedConnection>(m_ourKeys, socket);
-        m_waitingForApproval.push_back(std::move(encrypted_connection));
+        m_waitingForApproval.insert(std::move(encrypted_connection));
+
+        connect(encrypted_connection.get(), &EncryptedConnection::connectionEstablished,
+                this, &EncryptedServer::connectionEstablished);
+
+        connect(encrypted_connection.get(), &EncryptedConnection::connectionClosed,
+                this, &EncryptedServer::connectionClosed);
     }
 }
 
@@ -54,4 +60,16 @@ void EncryptedServer::newConnection()
 void EncryptedServer::validateTheirsPublicKey(IEncryptedConnection *)
 {
 
+}
+
+
+void EncryptedServer::connectionEstablished(IEncryptedConnection* connection)
+{
+
+}
+
+
+void EncryptedServer::connectionClosed(IEncryptedConnection* connection)
+{
+    m_waitingForApproval.find(connection);
 }
