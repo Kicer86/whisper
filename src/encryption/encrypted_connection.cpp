@@ -44,7 +44,10 @@ EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ou
 
     m_socket->connectToHost(host, port);
 
-    sendPublicKey();
+    connect(m_socket, &QTcpSocket::connected, [this]()
+    {
+        sendPublicKey();
+    });
 }
 
 
@@ -62,9 +65,7 @@ EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ou
 
 EncryptedConnection::~EncryptedConnection()
 {
-    m_socket->disconnectFromHost();
-
-    m_socket->state() == QAbstractSocket::UnconnectedState || m_socket->waitForDisconnected(1000);
+    closeConnection();
 }
 
 
@@ -203,7 +204,18 @@ void EncryptedConnection::socketStateChanged(QAbstractSocket::SocketState socket
 
 void EncryptedConnection::socketError(QAbstractSocket::SocketError error)
 {
-    qDebug() << "client socket error" << error;
+    switch(error)
+    {
+        case QAbstractSocket::HostNotFoundError:
+        case QAbstractSocket::ConnectionRefusedError:
+            closeConnection();
+            break;
+
+        default:
+            qDebug() << "client socket error" << error;
+            closeConnection();
+            break;
+    }
 }
 
 
@@ -263,4 +275,12 @@ void EncryptedConnection::readyRead()
 void EncryptedConnection::disconnected()
 {
     qDebug() << "socket disconnected";
+}
+
+
+void EncryptedConnection::closeConnection()
+{
+    m_socket->disconnectFromHost();
+
+    m_socket->state() == QAbstractSocket::UnconnectedState || m_socket->waitForDisconnected(1000);
 }
