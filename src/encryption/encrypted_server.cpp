@@ -70,7 +70,8 @@ void EncryptedServer::connectionEstablished(IEncryptedConnection* connection)
     }
     else
     {
-
+        auto connection_node = m_waitingForApproval.extract(it);
+        m_connectionManager.add(std::move(connection_node.value()));
     }
 }
 
