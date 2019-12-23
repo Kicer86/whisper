@@ -47,7 +47,6 @@ class EncryptedServer final: public QTcpServer
         std::set<std::unique_ptr<IEncryptedConnection>, utils::pointer_comp<IEncryptedConnection>> m_waitingForApproval;
 
         void newConnection();
-        void validateTheirsPublicKey(IEncryptedConnection *);
 
         void connectionEstablished(IEncryptedConnection *);
         void connectionClosed(IEncryptedConnection *);

@@ -57,19 +57,26 @@ void EncryptedServer::newConnection()
 }
 
 
-void EncryptedServer::validateTheirsPublicKey(IEncryptedConnection *)
-{
-
-}
-
-
 void EncryptedServer::connectionEstablished(IEncryptedConnection* connection)
 {
+    auto it = m_waitingForApproval.find(connection);
 
+    if (it == m_waitingForApproval.end())       // weird - we did not expect this to happen
+    {
+        connection->closeConnection();
+        m_waitingForApproval.erase(it);
+    }
+    else
+    {
+
+    }
 }
 
 
 void EncryptedServer::connectionClosed(IEncryptedConnection* connection)
 {
-    m_waitingForApproval.find(connection);
+    auto it = m_waitingForApproval.find(connection);
+
+    if (it != m_waitingForApproval.end())       // connection closed before being established
+        m_waitingForApproval.erase(it);
 }

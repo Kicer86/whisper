@@ -11,6 +11,7 @@ struct IEncryptedConnection
     virtual ~IEncryptedConnection() = default;
 
     virtual const Botan::Public_Key* getTheirsPublicKey() const = 0;
+    virtual void closeConnection() = 0;
 };
 
 
