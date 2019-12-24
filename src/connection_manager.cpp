@@ -17,7 +17,12 @@
 
 #include "connection_manager.hpp"
 
+#include <QDebug>
+
+
 void ConnectionManager::add(std::unique_ptr<IEncryptedConnection> connection)
 {
+    qDebug() << "registering new connection";
+
     m_connections.emplace_back(std::move(connection));
 }
