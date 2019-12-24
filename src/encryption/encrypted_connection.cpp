@@ -37,7 +37,7 @@ namespace
 
 
 EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, const QString& host, quint16 port)
-    : EncryptedConnection(ourKeys, WaitForPublicKeyFromHost)
+    : EncryptedConnection(ourKeys)
 {
     m_socket = new QTcpSocket(this);
     connectToSocketSignals();
@@ -53,7 +53,7 @@ EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ou
 
 
 EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, QTcpSocket* socket)
-    : EncryptedConnection(ourKeys, WaitForPublicKeyFromHost)
+    : EncryptedConnection(ourKeys)
 {
     m_socket = socket;
     m_socket->setParent(this);
@@ -81,11 +81,11 @@ const Botan::Public_Key* EncryptedConnection::getTheirsPublicKey() const
 }
 
 
-EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, State state)
+EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys)
     : m_ourKeys(ourKeys)
     , m_symmetricKeyPart(SymmetricKeySize)
     , m_socket(nullptr)
-    , m_state(state)
+    , m_state(WaitForPublicKeyFromHost)
 {
     // prepare part of symmetric key
     Botan::RandomNumberGenerator& rng = m_ourKeys->randomGenerator();

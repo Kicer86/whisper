@@ -59,7 +59,7 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
             Ready,
         } m_state;
 
-        EncryptedConnection(const IEncryptionPrimitivesProvider *, State);
+        EncryptedConnection(const IEncryptionPrimitivesProvider *);
 
         void connectToSocketSignals();
 
