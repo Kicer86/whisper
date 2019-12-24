@@ -26,7 +26,7 @@
 /**
  * @brief class for managing connections
  */
-class ConnectionManager : public IConnectionManager
+class ConnectionManager: public IConnectionManager
 {
     public:
         void add(std::unique_ptr<IEncryptedConnection>) override;
