@@ -5,6 +5,8 @@ find_package(OpenLibrary 2.4 REQUIRED COMPONENTS utils_qt)
 find_package(Botan 2.12 REQUIRED)
 
 set(WHISPER_SOURCES
+                encryption/connection_monitor.cpp
+                encryption/connection_monitor.hpp
                 encryption/encrypted_client.cpp
                 encryption/encrypted_client.hpp
                 encryption/encrypted_connection.cpp
