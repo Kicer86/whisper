@@ -27,7 +27,7 @@
 EncryptedServer::EncryptedServer(const IEncryptionPrimitivesProvider* ourKeys, const IIdentityChecker& identityChecker, IConnectionManager& connection_manager)
     : m_ourKeys(ourKeys)
     , m_identityChecker(identityChecker)
-    , m_connectionManager(connection_manager)
+    , m_connectionMonitor(connection_manager)
 {
     connect(this, &QTcpServer::newConnection, this, &EncryptedServer::newConnection);
 }
@@ -46,40 +46,6 @@ void EncryptedServer::newConnection()
         QTcpSocket* socket = nextPendingConnection();
 
         auto encrypted_connection = std::make_unique<EncryptedConnection>(m_ourKeys, socket);
-        m_waitingForApproval.insert(std::move(encrypted_connection));
-
-        connect(encrypted_connection.get(), &EncryptedConnection::connectionEstablished,
-                this, &EncryptedServer::connectionEstablished);
-
-        connect(encrypted_connection.get(), &EncryptedConnection::connectionClosed,
-                this, &EncryptedServer::connectionClosed);
+        m_connectionMonitor.watch(std::move(encrypted_connection));
     }
-}
-
-
-void EncryptedServer::connectionEstablished(IEncryptedConnection* connection)
-{
-    auto it = m_waitingForApproval.find(connection);
-
-    if (it == m_waitingForApproval.end())       // weird - we did not expect this to happen
-    {
-        qCritical() << "unexpected establishment";
-
-        connection->closeConnection();
-        m_waitingForApproval.erase(it);
-    }
-    else
-    {
-        auto connection_node = m_waitingForApproval.extract(it);
-        m_connectionManager.add(std::move(connection_node.value()));
-    }
-}
-
-
-void EncryptedServer::connectionClosed(IEncryptedConnection* connection)
-{
-    auto it = m_waitingForApproval.find(connection);
-
-    if (it != m_waitingForApproval.end())       // connection closed before being established
-        m_waitingForApproval.erase(it);
 }

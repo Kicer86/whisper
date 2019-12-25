@@ -16,3 +16,52 @@
  */
 
 #include "connection_monitor.hpp"
+
+#include "encrypted_connection.hpp"
+#include "iconnection_manager.hpp"
+
+
+ConnectionMonitor::ConnectionMonitor(IConnectionManager& manager)
+    : m_connectionManager(manager)
+{
+}
+
+
+void ConnectionMonitor::watch(std::unique_ptr<EncryptedConnection> connection)
+{
+    connect(connection.get(), &EncryptedConnection::connectionEstablished,
+            this, &ConnectionMonitor::connectionEstablished);
+
+    connect(connection.get(), &EncryptedConnection::connectionClosed,
+            this, &ConnectionMonitor::connectionClosed);
+
+    m_waitingForApproval.insert(std::move(connection));
+}
+
+
+void ConnectionMonitor::connectionEstablished(IEncryptedConnection* connection)
+{
+    auto it = m_waitingForApproval.find(connection);
+
+    if (it == m_waitingForApproval.end())       // weird - we did not expect this to happen
+    {
+        qCritical() << "unexpected establishment";
+
+        connection->closeConnection();
+        m_waitingForApproval.erase(it);
+    }
+    else
+    {
+        auto connection_node = m_waitingForApproval.extract(it);
+        m_connectionManager.add(std::move(connection_node.value()));
+    }
+}
+
+
+void ConnectionMonitor::connectionClosed(IEncryptedConnection* connection)
+{
+    auto it = m_waitingForApproval.find(connection);
+
+    if (it != m_waitingForApproval.end())       // connection closed before being established
+        m_waitingForApproval.erase(it);
+}

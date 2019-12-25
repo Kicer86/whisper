@@ -18,11 +18,31 @@
 #ifndef CONNECTIONMONITOR_HPP
 #define CONNECTIONMONITOR_HPP
 
+#include <memory>
+#include <set>
+#include <QObject>
+
+#include "../utils.hpp"
+
+class EncryptedConnection;
+class IConnectionManager;
+class IEncryptedConnection;
+
 /**
  * @brief class for monitoring not yet established connections
  */
-class ConnectionMonitor
+class ConnectionMonitor: public QObject
 {
+    public:
+        ConnectionMonitor(IConnectionManager &);
+        void watch(std::unique_ptr<EncryptedConnection>);
+
+    private:
+        std::set<std::unique_ptr<IEncryptedConnection>, utils::pointer_comp<IEncryptedConnection>> m_waitingForApproval;
+        IConnectionManager& m_connectionManager;
+
+        void connectionEstablished(IEncryptedConnection *);
+        void connectionClosed(IEncryptedConnection *);
 };
 
 #endif // CONNECTIONMONITOR_HPP
