@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 
     /// @todo validate keys
 
-    ConnectionManager connectionManager;
+    ConnectionManager connectionManager(usersManager);
 
     const quint16 port = static_cast<quint16>(configuration.getEntry("port").toInt());
     Server server(&manager, connectionManager, port);

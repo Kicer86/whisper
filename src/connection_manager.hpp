@@ -23,16 +23,21 @@
 #include "encryption/iconnection_manager.hpp"
 #include "encryption/iencrypted_connection.hpp"
 
+
+class IUserManager;
+
 /**
  * @brief class for managing connections
  */
 class ConnectionManager: public IConnectionManager
 {
     public:
+        ConnectionManager(const IUserManager &);
         void add(std::unique_ptr<IEncryptedConnection>) override;
 
     private:
         std::deque<std::unique_ptr<IEncryptedConnection>> m_connections;
+        const IUserManager& m_userManager;
 };
 
 #endif // CONNECTIONMANAGER_HPP

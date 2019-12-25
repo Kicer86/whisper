@@ -17,12 +17,36 @@
 
 #include "connection_manager.hpp"
 
+#include <botan/x509_key.h>
 #include <QDebug>
+
+#include "iuser_manager.hpp"
+
+
+ConnectionManager::ConnectionManager(const IUserManager& usrMgr)
+    : m_userManager(usrMgr)
+{
+}
 
 
 void ConnectionManager::add(std::unique_ptr<IEncryptedConnection> connection)
 {
     qDebug() << "registering new connection";
+
+    const auto& users = m_userManager.listUsers();
+    const Botan::Public_Key* public_key = connection->getTheirsPublicKey();
+    std::string public_key_encoded = Botan::X509::PEM_encode(*public_key);
+
+    for(const UserId& userId: users)
+    {
+        const QByteArray pkey = m_userManager.publicKey(userId);
+
+        if (public_key_encoded.c_str() == pkey)
+        {
+            qDebug() << "matched connection to existing user";
+            break;
+        }
+    }
 
     m_connections.emplace_back(std::move(connection));
 }
