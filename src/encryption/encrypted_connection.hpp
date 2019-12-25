@@ -39,6 +39,7 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         ~EncryptedConnection();
 
         const Botan::Public_Key* getTheirsPublicKey() const override;
+        void closeConnection() override;
 
     private:
         const IEncryptionPrimitivesProvider* m_ourKeys;
@@ -73,7 +74,6 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         void socketError(QAbstractSocket::SocketError);
         void readyRead();
         void disconnected();
-        void closeConnection() override;
 
     signals:
         void connectionEstablished(IEncryptedConnection *);
