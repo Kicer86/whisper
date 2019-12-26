@@ -33,6 +33,8 @@ class ConnectionManager: public IConnectionManager
 {
     public:
         ConnectionManager(const IUserManager &);
+        ~ConnectionManager();
+
         void add(std::unique_ptr<IEncryptedConnection>) override;
 
     private:

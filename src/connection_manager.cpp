@@ -29,6 +29,13 @@ ConnectionManager::ConnectionManager(const IUserManager& usrMgr)
 }
 
 
+ConnectionManager::~ConnectionManager()
+{
+    for (auto& connection: m_connections)
+        connection->closeConnection();
+}
+
+
 void ConnectionManager::add(std::unique_ptr<IEncryptedConnection> connection)
 {
     qDebug() << "registering new connection";
