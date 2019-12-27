@@ -290,8 +290,6 @@ void EncryptedConnection::readyRead()
 void EncryptedConnection::disconnected()
 {
     qDebug() << "socket disconnected";
-
-    emit connectionClosed(this);
 }
 
 

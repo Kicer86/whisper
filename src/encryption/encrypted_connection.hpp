@@ -81,7 +81,6 @@ class EncryptedConnection: public IEncryptedConnection
 
     signals:
         void connectionEstablished(EncryptedConnection *);
-        void connectionClosed(EncryptedConnection *);
 };
 
 

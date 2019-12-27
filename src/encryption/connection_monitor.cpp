@@ -36,11 +36,15 @@ ConnectionMonitor::~ConnectionMonitor()
 
 void ConnectionMonitor::watch(std::unique_ptr<EncryptedConnection> connection)
 {
-    connect(connection.get(), &EncryptedConnection::connectionEstablished,
+    EncryptedConnection* connectionPtr = connection.get();
+
+    connect(connectionPtr, &EncryptedConnection::connectionEstablished,
             this, &ConnectionMonitor::connectionEstablished);
 
-    connect(connection.get(), &EncryptedConnection::connectionClosed,
-            this, &ConnectionMonitor::connectionClosed);
+    connect(connectionPtr, &EncryptedConnection::aboutToClose,
+            [this, connectionPtr]() {
+            this->connectionClosed(connectionPtr);
+    });
 
     m_waitingForApproval.insert(std::move(connection));
 }
