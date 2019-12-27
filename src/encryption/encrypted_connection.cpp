@@ -279,7 +279,7 @@ void EncryptedConnection::readyRead()
         qCritical() << "Unexpected data in protocol";
         closeConnection();
     }
-    catch(const protocol_error &)           /// something unexpected happend, @todo kill connection
+    catch(const protocol_error &)           /// something unexpected happend
     {
         qCritical() << "Broken protocol";
         closeConnection();
