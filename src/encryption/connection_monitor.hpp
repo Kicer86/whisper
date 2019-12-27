@@ -46,6 +46,8 @@ class ConnectionMonitor: public QObject
 
         void connectionEstablished(EncryptedConnection *);
         void connectionClosed(EncryptedConnection *);
+
+        std::unique_ptr<EncryptedConnection> extractConnection(EncryptedConnection *);
 };
 
 #endif // CONNECTIONMONITOR_HPP

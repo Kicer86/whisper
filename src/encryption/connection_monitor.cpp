@@ -50,25 +50,16 @@ void ConnectionMonitor::watch(std::unique_ptr<EncryptedConnection> connection)
 
 void ConnectionMonitor::connectionEstablished(EncryptedConnection* connection)
 {
-    auto it = m_waitingForApproval.find(connection);
+    auto connection_ptr = extractConnection(connection);
 
-    if (it == m_waitingForApproval.end())       // weird - we did not expect this to happen
+    if (connection_ptr.get() == nullptr)       // weird - we did not expect this to happen
     {
         qCritical() << "unexpected establishment";
 
         connection->close();
-        m_waitingForApproval.erase(it);
     }
     else
-    {
-        for (auto& connection_obj: it->second)
-            QObject::disconnect(connection_obj);
-
-        auto connection_node = m_waitingForApproval.extract(it);
-        auto connection_ptr = std::move(connection_node.key());
-
         m_connectionManager.add(std::move(connection_ptr));
-    }
 }
 
 
@@ -78,4 +69,23 @@ void ConnectionMonitor::connectionClosed(EncryptedConnection* connection)
 
     if (it != m_waitingForApproval.end())       // connection closed before being established
         m_waitingForApproval.erase(it);
+}
+
+
+std::unique_ptr<EncryptedConnection> ConnectionMonitor::extractConnection(EncryptedConnection* connection)
+{
+    std::unique_ptr<EncryptedConnection> result;
+
+    auto it = m_waitingForApproval.find(connection);
+
+    if (it != m_waitingForApproval.end())
+    {
+        for (auto& connection_obj: it->second)
+                QObject::disconnect(connection_obj);
+
+        auto connection_node = m_waitingForApproval.extract(it);
+        result = std::move(connection_node.key());
+    }
+
+    return result;
 }
