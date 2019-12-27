@@ -46,7 +46,7 @@ void ConnectionMonitor::watch(std::unique_ptr<EncryptedConnection> connection)
 }
 
 
-void ConnectionMonitor::connectionEstablished(IEncryptedConnection* connection)
+void ConnectionMonitor::connectionEstablished(EncryptedConnection* connection)
 {
     auto it = m_waitingForApproval.find(connection);
 
@@ -65,7 +65,7 @@ void ConnectionMonitor::connectionEstablished(IEncryptedConnection* connection)
 }
 
 
-void ConnectionMonitor::connectionClosed(IEncryptedConnection* connection)
+void ConnectionMonitor::connectionClosed(EncryptedConnection* connection)
 {
     auto it = m_waitingForApproval.find(connection);
 

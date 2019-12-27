@@ -40,11 +40,11 @@ class ConnectionMonitor: public QObject
         void watch(std::unique_ptr<EncryptedConnection>);
 
     private:
-        std::set<std::unique_ptr<IEncryptedConnection>, utils::pointer_comp<IEncryptedConnection>> m_waitingForApproval;
+        std::set<std::unique_ptr<EncryptedConnection>, utils::pointer_comp<EncryptedConnection>> m_waitingForApproval;
         IConnectionManager& m_connectionManager;
 
-        void connectionEstablished(IEncryptedConnection *);
-        void connectionClosed(IEncryptedConnection *);
+        void connectionEstablished(EncryptedConnection *);
+        void connectionClosed(EncryptedConnection *);
 };
 
 #endif // CONNECTIONMONITOR_HPP

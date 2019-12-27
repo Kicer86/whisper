@@ -76,8 +76,8 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         void disconnected();
 
     signals:
-        void connectionEstablished(IEncryptedConnection *);
-        void connectionClosed(IEncryptedConnection *);
+        void connectionEstablished(EncryptedConnection *);
+        void connectionClosed(EncryptedConnection *);
 };
 
 
