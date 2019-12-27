@@ -19,7 +19,7 @@
 #define CONNECTIONMONITOR_HPP
 
 #include <memory>
-#include <set>
+#include <map>
 #include <QObject>
 
 #include "../utils.hpp"
@@ -40,7 +40,8 @@ class ConnectionMonitor: public QObject
         void watch(std::unique_ptr<EncryptedConnection>);
 
     private:
-        std::set<std::unique_ptr<EncryptedConnection>, utils::pointer_comp<EncryptedConnection>> m_waitingForApproval;
+        typedef std::vector<QMetaObject::Connection> Connections;
+        std::map<std::unique_ptr<EncryptedConnection>, Connections, utils::pointer_comp<EncryptedConnection>> m_waitingForApproval;
         IConnectionManager& m_connectionManager;
 
         void connectionEstablished(EncryptedConnection *);

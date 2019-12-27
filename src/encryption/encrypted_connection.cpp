@@ -271,7 +271,7 @@ void EncryptedConnection::readyRead()
         {
             QIODevice::open(QIODevice::ReadWrite);
 
-            emit connectionEstablished(this);
+            emit connectionEstablished();
             m_state = Ready;
         }
     }

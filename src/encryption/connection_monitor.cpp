@@ -30,7 +30,7 @@ ConnectionMonitor::ConnectionMonitor(IConnectionManager& manager)
 ConnectionMonitor::~ConnectionMonitor()
 {
     for (auto& connection: m_waitingForApproval)
-        connection->close();
+        connection.first->close();
 }
 
 
@@ -38,15 +38,13 @@ void ConnectionMonitor::watch(std::unique_ptr<EncryptedConnection> connection)
 {
     EncryptedConnection* connectionPtr = connection.get();
 
-    connect(connectionPtr, &EncryptedConnection::connectionEstablished,
-            this, &ConnectionMonitor::connectionEstablished);
+    auto establishmentConnection = connect(connectionPtr, &EncryptedConnection::connectionEstablished,
+                                           std::bind(&ConnectionMonitor::connectionEstablished, this, connectionPtr));
 
-    connect(connectionPtr, &EncryptedConnection::aboutToClose,
-            [this, connectionPtr]() {
-            this->connectionClosed(connectionPtr);
-    });
+    auto closeConnection = connect(connectionPtr, &EncryptedConnection::aboutToClose,
+                                   std::bind(&ConnectionMonitor::connectionClosed, this, connectionPtr));
 
-    m_waitingForApproval.insert(std::move(connection));
+    m_waitingForApproval.emplace(std::move(connection), Connections{ establishmentConnection, closeConnection } );
 }
 
 
@@ -63,8 +61,13 @@ void ConnectionMonitor::connectionEstablished(EncryptedConnection* connection)
     }
     else
     {
+        for (auto& connection_obj: it->second)
+            QObject::disconnect(connection_obj);
+
         auto connection_node = m_waitingForApproval.extract(it);
-        m_connectionManager.add(std::move(connection_node.value()));
+        auto connection_ptr = std::move(connection_node.key());
+
+        m_connectionManager.add(std::move(connection_ptr));
     }
 }
 

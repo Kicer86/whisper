@@ -81,7 +81,7 @@ class EncryptedConnection: public IEncryptedConnection
         void disconnected();
 
     signals:
-        void connectionEstablished(EncryptedConnection *);
+        void connectionEstablished() const;
 };
 
 
