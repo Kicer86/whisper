@@ -6,11 +6,18 @@
 #include <botan/pk_keys.h>
 
 
-struct IEncryptedConnection: QIODevice
+class IEncryptedConnection: public QIODevice
 {
+    Q_OBJECT
+
+public:
     virtual ~IEncryptedConnection() = default;
 
     virtual const Botan::Public_Key* getTheirsPublicKey() const = 0;
+
+signals:
+    void protocolCriticalError();
+    void connectionClosed();
 };
 
 

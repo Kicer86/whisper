@@ -279,11 +279,15 @@ void EncryptedConnection::readyRead()
     catch(const unexpected_data &)          /// error in protocol - unexpected data
     {
         qCritical() << "Unexpected data in protocol";
+
+        emit protocolCriticalError();
         close();
     }
     catch(const protocol_error &)           /// something unexpected happend
     {
         qCritical() << "Broken protocol";
+
+        emit protocolCriticalError();
         close();
     }
 }
@@ -303,6 +307,8 @@ void EncryptedConnection::close()
 
     m_socket->disconnectFromHost();
     m_socket->state() == QAbstractSocket::UnconnectedState || m_socket->waitForDisconnected(1000);
+
+    emit connectionClosed();
 }
 
 

@@ -41,7 +41,7 @@ void ConnectionMonitor::watch(std::unique_ptr<EncryptedConnection> connection)
     auto establishmentConnection = connect(connectionPtr, &EncryptedConnection::connectionEstablished,
                                            std::bind(&ConnectionMonitor::connectionEstablished, this, connectionPtr));
 
-    auto closeConnection = connect(connectionPtr, &EncryptedConnection::aboutToClose,
+    auto closeConnection = connect(connectionPtr, &EncryptedConnection::connectionClosed,
                                    std::bind(&ConnectionMonitor::connectionClosed, this, connectionPtr));
 
     m_waitingForApproval.emplace(std::move(connection), Connections{ establishmentConnection, closeConnection } );
