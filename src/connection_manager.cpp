@@ -32,7 +32,7 @@ ConnectionManager::ConnectionManager(const IUserManager& usrMgr)
 ConnectionManager::~ConnectionManager()
 {
     for (auto& connection: m_connections)
-        connection->close();
+        connection.first->close();
 }
 
 
@@ -55,5 +55,28 @@ void ConnectionManager::add(std::unique_ptr<IEncryptedConnection> connection)
         }
     }
 
-    m_connections.emplace_back(std::move(connection));
+    auto closeConnection = connect(connection.get(), &IEncryptedConnection::connectionClosed,
+                                   std::bind(&ConnectionManager::connectionClosed, this, connection.get()));
+
+    m_connections.emplace(std::move(connection), Connections{closeConnection});
+}
+
+
+void ConnectionManager::connectionClosed(IEncryptedConnection* connection)
+{
+    dropConnection(connection);
+}
+
+
+void ConnectionManager::dropConnection(IEncryptedConnection* connection)
+{
+    auto it = m_connections.find(connection);
+
+    if (it != m_connections.end())
+    {
+        for (auto& connection_obj: it->second)
+            QObject::disconnect(connection_obj);
+
+        m_connections.erase(it);
+    }
 }

@@ -18,19 +18,21 @@
 #ifndef CONNECTIONMANAGER_HPP
 #define CONNECTIONMANAGER_HPP
 
-#include <deque>
+#include <map>
 
 #include "encryption/iconnection_manager.hpp"
 #include "encryption/iencrypted_connection.hpp"
-
+#include "utils.hpp"
 
 class IUserManager;
 
 /**
  * @brief class for managing connections
  */
-class ConnectionManager: public IConnectionManager
+class ConnectionManager: public QObject, public IConnectionManager
 {
+        Q_OBJECT
+
     public:
         ConnectionManager(const IUserManager &);
         ~ConnectionManager();
@@ -38,8 +40,13 @@ class ConnectionManager: public IConnectionManager
         void add(std::unique_ptr<IEncryptedConnection>) override;
 
     private:
-        std::deque<std::unique_ptr<IEncryptedConnection>> m_connections;
+        typedef std::vector<QMetaObject::Connection> Connections;
+        std::map<std::unique_ptr<IEncryptedConnection>, Connections, utils::pointer_comp<IEncryptedConnection>> m_connections;
+
         const IUserManager& m_userManager;
+
+        void connectionClosed(IEncryptedConnection *);
+        void dropConnection(IEncryptedConnection *);
 };
 
 #endif // CONNECTIONMANAGER_HPP
