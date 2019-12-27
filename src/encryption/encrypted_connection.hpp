@@ -22,7 +22,6 @@
 #include "iencrypted_connection.hpp"
 
 #include <QTcpSocket>
-#include <botan/pk_keys.h>
 
 struct IEncryptionPrimitivesProvider;
 
@@ -39,8 +38,10 @@ class EncryptedConnection: public IEncryptedConnection
         EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, QTcpSocket *);
         ~EncryptedConnection();
 
-        const Botan::Public_Key* getTheirsPublicKey() const;
+        // IEncryptedConnection:
+        const Botan::Public_Key* getTheirsPublicKey() const override;
 
+        // QIODevice:
         void close() override;
         qint64 readData(char *data, qint64 maxSize) override;
         qint64 writeData(const char *data, qint64 maxSize) override;

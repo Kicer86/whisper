@@ -41,7 +41,7 @@ void ConnectionManager::add(std::unique_ptr<IEncryptedConnection> connection)
     qDebug() << "registering new connection";
 
     const auto& users = m_userManager.listUsers();
-    const Botan::Public_Key* public_key = nullptr; //connection->getTheirsPublicKey();
+    const Botan::Public_Key* public_key = connection->getTheirsPublicKey();
     std::string public_key_encoded = Botan::X509::PEM_encode(*public_key);
 
     for(const UserId& userId: users)
