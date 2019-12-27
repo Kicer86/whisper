@@ -65,13 +65,19 @@ EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ou
 
 EncryptedConnection::~EncryptedConnection()
 {
-    assert(m_socket->state() == QAbstractSocket::UnconnectedState);  // are we killing alive connection?!
+    m_socket->disconnect(this);    // stop listening, we are getting destroyed
 
+    assert(m_socket->state() == QAbstractSocket::UnconnectedState);  // are we killing alive connection?!
     if (m_socket->state() != QAbstractSocket::UnconnectedState)
-    {
-        m_socket->disconnect(this);    // stop listening, we are getting destroyed
         close();
-    }
+
+    // EncryptedConnection destructor may be called
+    // as a result of closed connection. So it is possible
+    // that QAbstractSocket::disconnected is on the stack above.
+    // Therefore we use deleteLater as suggested in qt's docs:
+    // https://doc.qt.io/qt-5/qabstractsocket.html#disconnected
+    m_socket->setParent(nullptr);
+    m_socket->deleteLater();
 }
 
 
