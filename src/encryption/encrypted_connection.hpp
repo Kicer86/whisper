@@ -38,7 +38,7 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, QTcpSocket *);
         ~EncryptedConnection();
 
-        const Botan::Public_Key* getTheirsPublicKey() const override;
+        const Botan::Public_Key* getTheirsPublicKey() const;
         void closeConnection() override;
 
     private:
