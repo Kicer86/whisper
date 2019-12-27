@@ -30,7 +30,7 @@ ConnectionMonitor::ConnectionMonitor(IConnectionManager& manager)
 ConnectionMonitor::~ConnectionMonitor()
 {
     for (auto& connection: m_waitingForApproval)
-        connection->closeConnection();
+        connection->close();
 }
 
 
@@ -54,7 +54,7 @@ void ConnectionMonitor::connectionEstablished(EncryptedConnection* connection)
     {
         qCritical() << "unexpected establishment";
 
-        connection->closeConnection();
+        connection->close();
         m_waitingForApproval.erase(it);
     }
     else

@@ -70,7 +70,7 @@ EncryptedConnection::~EncryptedConnection()
     if (m_socket->state() != QAbstractSocket::UnconnectedState)
     {
         m_socket->disconnect(this);    // stop listening, we are getting destroyed
-        closeConnection();
+        close();
     }
 }
 
@@ -215,12 +215,12 @@ void EncryptedConnection::socketError(QAbstractSocket::SocketError error)
         case QAbstractSocket::HostNotFoundError:
         case QAbstractSocket::ConnectionRefusedError:
         case QAbstractSocket::RemoteHostClosedError:
-            closeConnection();
+            close();
             break;
 
         default:
             qDebug() << "client socket error" << error;
-            closeConnection();
+            close();
             break;
     }
 }
@@ -277,12 +277,12 @@ void EncryptedConnection::readyRead()
     catch(const unexpected_data &)          /// error in protocol - unexpected data
     {
         qCritical() << "Unexpected data in protocol";
-        closeConnection();
+        close();
     }
     catch(const protocol_error &)           /// something unexpected happend
     {
         qCritical() << "Broken protocol";
-        closeConnection();
+        close();
     }
 }
 
@@ -295,10 +295,24 @@ void EncryptedConnection::disconnected()
 }
 
 
-void EncryptedConnection::closeConnection()
+void EncryptedConnection::close()
 {
     qDebug() << "closing connection gracefully";
-    m_socket->disconnectFromHost();
 
+    QIODevice::close();
+
+    m_socket->disconnectFromHost();
     m_socket->state() == QAbstractSocket::UnconnectedState || m_socket->waitForDisconnected(1000);
+}
+
+
+qint64 EncryptedConnection::readData(char* data, qint64 maxSize)
+{
+    return 0;
+}
+
+
+qint64 EncryptedConnection::writeData(const char* data, qint64 maxSize)
+{
+    return 0;
 }

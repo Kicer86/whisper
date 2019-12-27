@@ -2,15 +2,12 @@
 #ifndef IENCRYPTED_CONNECTION_HPP_INCLUDED
 #define IENCRYPTED_CONNECTION_HPP_INCLUDED
 
-#include <QSslKey>
-#include <botan/pk_keys.h>
+#include <QIODevice>
 
 
-struct IEncryptedConnection
+struct IEncryptedConnection: QIODevice
 {
     virtual ~IEncryptedConnection() = default;
-
-    virtual void closeConnection() = 0;
 };
 
 
