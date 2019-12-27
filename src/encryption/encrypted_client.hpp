@@ -23,6 +23,7 @@
 #include <botan/pk_keys.h>
 
 #include "iencrypted_connection.hpp"
+#include "connection_monitor.hpp"
 
 class QTcpSocket;
 struct IConnectionManager;
@@ -41,7 +42,7 @@ class EncryptedClient
 
     private:
         const IEncryptionPrimitivesProvider* m_ourKeys;
-        IConnectionManager& m_connectionManager;
+        ConnectionMonitor m_connectionMonitor;
 
         void sendPublicKey(QTcpSocket &);
 };

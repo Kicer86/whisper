@@ -5,6 +5,8 @@ find_package(OpenLibrary 2.4 REQUIRED COMPONENTS utils_qt)
 find_package(Botan 2.12 REQUIRED)
 
 set(WHISPER_SOURCES
+                encryption/connection_monitor.cpp
+                encryption/connection_monitor.hpp
                 encryption/encrypted_client.cpp
                 encryption/encrypted_client.hpp
                 encryption/encrypted_connection.cpp
@@ -17,7 +19,6 @@ set(WHISPER_SOURCES
                 encryption/iencrypted_connection.hpp
                 encryption/iidentity_checker.hpp
                 encryption/iencryption_primitives_provider.hpp
-                encryption/utils.hpp
                 connection_manager.cpp
                 connection_manager.hpp
                 identity_checker.cpp
@@ -34,6 +35,7 @@ set(WHISPER_SOURCES
                 user_list_widget.hpp
                 user_manager.cpp
                 user_manager.hpp
+                utils.hpp
 )
 
 if (ANDROID)

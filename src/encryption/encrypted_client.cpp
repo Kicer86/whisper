@@ -25,7 +25,7 @@
 
 EncryptedClient::EncryptedClient(const IEncryptionPrimitivesProvider* ourKeys, IConnectionManager& connection_manager)
     : m_ourKeys(ourKeys)
-    , m_connectionManager(connection_manager)
+    , m_connectionMonitor(connection_manager)
 {
     /// @todo do no work with invalid public key
 }
@@ -35,7 +35,7 @@ void EncryptedClient::makeConnection(const QString& address, quint16 port)
 {
     auto encryptedConnection = std::make_unique<EncryptedConnection>(m_ourKeys, address, port);
 
-    m_connectionManager.add(std::move(encryptedConnection));
+    m_connectionMonitor.watch(std::move(encryptedConnection));
 }
 
 

@@ -29,7 +29,7 @@ struct IEncryptionPrimitivesProvider;
  * @brief representation of encrypted connection
  */
 
-class EncryptedConnection: public QObject, public IEncryptedConnection
+class EncryptedConnection: public IEncryptedConnection
 {
         Q_OBJECT
 
@@ -38,27 +38,34 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, QTcpSocket *);
         ~EncryptedConnection();
 
+        // IEncryptedConnection:
         const Botan::Public_Key* getTheirsPublicKey() const override;
+
+        // QIODevice:
+        void close() override;
+        qint64 readData(char *data, qint64 maxSize) override;
+        qint64 writeData(const char *data, qint64 maxSize) override;
 
     private:
         const IEncryptionPrimitivesProvider* m_ourKeys;
         std::unique_ptr<Botan::Public_Key> m_theirsPublicKey;
+        std::vector<unsigned char> m_symmetricKeyPart;
         std::vector<unsigned char> m_symmetricKey;
         QTcpSocket* m_socket;
 
         struct not_enouth_data: std::exception {};
         struct unexpected_data: std::exception {};
+        struct protocol_error: std::exception {};
 
         enum State
         {
             WaitForPublicKeyFromHost,
-            AcceptClient,
             WaitForSymmetricKeyFromHost,
             ConnectionEstablished,
             Ready,
         } m_state;
 
-        EncryptedConnection(const IEncryptionPrimitivesProvider *, State);
+        EncryptedConnection(const IEncryptionPrimitivesProvider *);
 
         void connectToSocketSignals();
 
@@ -74,7 +81,7 @@ class EncryptedConnection: public QObject, public IEncryptedConnection
         void disconnected();
 
     signals:
-        void connectionEstablished(IEncryptedConnection *);
+        void connectionEstablished() const;
 };
 
 

@@ -19,9 +19,12 @@
 #define ENCRYPTEDSERVER_HPP
 
 #include <memory>
+#include <set>
 #include <QTcpServer>
 #include <QSslKey>
 #include <botan/pk_keys.h>
+
+#include "connection_monitor.hpp"
 
 struct IConnectionManager;
 struct IIdentityChecker;
@@ -40,11 +43,9 @@ class EncryptedServer final: public QTcpServer
     private:
         const IEncryptionPrimitivesProvider* m_ourKeys;
         const IIdentityChecker& m_identityChecker;
-        IConnectionManager& m_connectionManager;
-        std::vector<std::unique_ptr<IEncryptedConnection>> m_waitingForApproval;
+        ConnectionMonitor m_connectionMonitor;
 
         void newConnection();
-        void validateTheirsPublicKey(IEncryptedConnection *);
 };
 
 #endif // ENCRYPTEDSERVER_HPP

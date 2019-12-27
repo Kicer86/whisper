@@ -27,7 +27,7 @@
 EncryptedServer::EncryptedServer(const IEncryptionPrimitivesProvider* ourKeys, const IIdentityChecker& identityChecker, IConnectionManager& connection_manager)
     : m_ourKeys(ourKeys)
     , m_identityChecker(identityChecker)
-    , m_connectionManager(connection_manager)
+    , m_connectionMonitor(connection_manager)
 {
     connect(this, &QTcpServer::newConnection, this, &EncryptedServer::newConnection);
 }
@@ -46,12 +46,6 @@ void EncryptedServer::newConnection()
         QTcpSocket* socket = nextPendingConnection();
 
         auto encrypted_connection = std::make_unique<EncryptedConnection>(m_ourKeys, socket);
-        m_waitingForApproval.push_back(std::move(encrypted_connection));
+        m_connectionMonitor.watch(std::move(encrypted_connection));
     }
-}
-
-
-void EncryptedServer::validateTheirsPublicKey(IEncryptedConnection *)
-{
-
 }

@@ -24,7 +24,7 @@
 #include <botan/auto_rng.h>
 
 #include "iencryption_primitives_provider.hpp"
-#include "utils.hpp"
+#include "../utils.hpp"
 
 /// @todo: instead of passing or creating TcpSocket here, a QIODevice should be passed.
 //         this would make UT possible.
@@ -37,33 +37,47 @@ namespace
 
 
 EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, const QString& host, quint16 port)
-    : EncryptedConnection(ourKeys, WaitForPublicKeyFromHost)
+    : EncryptedConnection(ourKeys)
 {
     m_socket = new QTcpSocket(this);
     connectToSocketSignals();
 
     m_socket->connectToHost(host, port);
 
-    sendPublicKey();
+    connect(m_socket, &QTcpSocket::connected, [this]()
+    {
+        sendPublicKey();
+    });
 }
 
 
 
 EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, QTcpSocket* socket)
-    : EncryptedConnection(ourKeys, AcceptClient)
+    : EncryptedConnection(ourKeys)
 {
     m_socket = socket;
     m_socket->setParent(this);
-
     connectToSocketSignals();
+
+    sendPublicKey();
 }
 
 
 EncryptedConnection::~EncryptedConnection()
 {
-    m_socket->disconnectFromHost();
+    m_socket->disconnect(this);    // stop listening, we are getting destroyed
 
-    m_socket->state() == QAbstractSocket::UnconnectedState || m_socket->waitForDisconnected(1000);
+    assert(m_socket->state() == QAbstractSocket::UnconnectedState);  // are we killing alive connection?!
+    if (m_socket->state() != QAbstractSocket::UnconnectedState)
+        close();
+
+    // EncryptedConnection destructor may be called
+    // as a result of closed connection. So it is possible
+    // that QAbstractSocket::disconnected is on the stack above.
+    // Therefore we use deleteLater as suggested in qt's docs:
+    // https://doc.qt.io/qt-5/qabstractsocket.html#disconnected
+    m_socket->setParent(nullptr);
+    m_socket->deleteLater();
 }
 
 
@@ -73,12 +87,17 @@ const Botan::Public_Key* EncryptedConnection::getTheirsPublicKey() const
 }
 
 
-EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys, State state)
+EncryptedConnection::EncryptedConnection(const IEncryptionPrimitivesProvider* ourKeys)
     : m_ourKeys(ourKeys)
-    , m_symmetricKey(SymmetricKeySize)
+    , m_symmetricKeyPart(SymmetricKeySize)
     , m_socket(nullptr)
-    , m_state(state)
+    , m_state(WaitForPublicKeyFromHost)
 {
+    // prepare part of symmetric key
+    Botan::RandomNumberGenerator& rng = m_ourKeys->randomGenerator();
+
+    for(int i = 0; i < SymmetricKeySize; i++)
+        m_symmetricKeyPart[i] = rng.next_byte();
 }
 
 
@@ -110,13 +129,10 @@ void EncryptedConnection::sendPublicKey()
 
 void EncryptedConnection::sendSymmetricKey()
 {
+    // send our part of symmetric key
     Botan::RandomNumberGenerator& rng = m_ourKeys->randomGenerator();
-
-    for(int i = 0; i < SymmetricKeySize; i++)
-        m_symmetricKey[i] = rng.next_byte();
-
     Botan::PK_Encryptor_EME enc(*m_theirsPublicKey, rng, "EME1(SHA-256)");
-    std::vector<uint8_t> encrypted_key = enc.encrypt(m_symmetricKey, rng);
+    std::vector<uint8_t> encrypted_key = enc.encrypt(m_symmetricKeyPart, rng);
 
     const quint16 encrypted_message_size = static_cast<quint16>(encrypted_key.size());
     const char* encrypted_message_size_chars = utils::binary_cast<const char[2]>(encrypted_message_size);
@@ -151,6 +167,13 @@ void EncryptedConnection::readSymmetricKey()
     std::copy(decrypted_symmetric_key.cbegin(),
                 decrypted_symmetric_key.cend(),
                 std::back_inserter(m_symmetricKey));
+
+    if (m_symmetricKey.size() != m_symmetricKeyPart.size())
+        throw protocol_error{};
+
+    // xor received key with out part
+    for(unsigned int i = 0; i < m_symmetricKey.size(); i++)
+        m_symmetricKey[i] ^= m_symmetricKeyPart[i];
 }
 
 
@@ -193,7 +216,19 @@ void EncryptedConnection::socketStateChanged(QAbstractSocket::SocketState socket
 
 void EncryptedConnection::socketError(QAbstractSocket::SocketError error)
 {
-    qDebug() << "client socket error" << error;
+    switch(error)
+    {
+        case QAbstractSocket::HostNotFoundError:
+        case QAbstractSocket::ConnectionRefusedError:
+        case QAbstractSocket::RemoteHostClosedError:
+            close();
+            break;
+
+        default:
+            qDebug() << "client socket error" << error;
+            close();
+            break;
+    }
 }
 
 
@@ -204,32 +239,23 @@ void EncryptedConnection::readyRead()
         while (m_socket->bytesAvailable())
             switch (m_state)
             {
-                // server side only
-                case AcceptClient:
-                {
-                    readTheirsPublicKey();
-                    sendPublicKey();
-                    sendSymmetricKey();
-                    m_state = ConnectionEstablished;
-
-                    qDebug() << "client accepted";
-                    break;
-                }
-
-                // client side only
                 case WaitForPublicKeyFromHost:
                 {
                     readTheirsPublicKey();
+                    sendSymmetricKey();
 
                     m_state = WaitForSymmetricKeyFromHost;
 
-                    qDebug() << "accepted by server";
+                    qDebug() << "got public key";
+                    qDebug() << "sending symetric key";
                     break;
                 }
 
                 case WaitForSymmetricKeyFromHost:
                 {
                     readSymmetricKey();
+
+                    qDebug() << "got symmetric key";
 
                     m_state = ConnectionEstablished;
                     break;
@@ -249,16 +275,56 @@ void EncryptedConnection::readyRead()
 
         if (m_state == ConnectionEstablished)
         {
-            emit connectionEstablished(this);
+            QIODevice::open(QIODevice::ReadWrite);
+
+            emit connectionEstablished();
             m_state = Ready;
         }
     }
     catch(const not_enouth_data &) {}       /// this is not failure, wait for more
-    catch(const unexpected_data &) {}       /// some error in protocol, @todo kill connection
+    catch(const unexpected_data &)          /// error in protocol - unexpected data
+    {
+        qCritical() << "Unexpected data in protocol";
+
+        emit protocolCriticalError();
+        close();
+    }
+    catch(const protocol_error &)           /// something unexpected happend
+    {
+        qCritical() << "Broken protocol";
+
+        emit protocolCriticalError();
+        close();
+    }
 }
 
 
 void EncryptedConnection::disconnected()
 {
     qDebug() << "socket disconnected";
+}
+
+
+void EncryptedConnection::close()
+{
+    qDebug() << "closing connection gracefully";
+
+    QIODevice::close();
+
+    m_socket->disconnectFromHost();
+    m_socket->state() == QAbstractSocket::UnconnectedState || m_socket->waitForDisconnected(1000);
+
+    emit connectionClosed();
+}
+
+
+qint64 EncryptedConnection::readData(char* data, qint64 maxSize)
+{
+    return 0;
+}
+
+
+qint64 EncryptedConnection::writeData(const char* data, qint64 maxSize)
+{
+    return 0;
 }

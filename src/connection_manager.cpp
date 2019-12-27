@@ -17,7 +17,66 @@
 
 #include "connection_manager.hpp"
 
+#include <botan/x509_key.h>
+#include <QDebug>
+
+#include "iuser_manager.hpp"
+
+
+ConnectionManager::ConnectionManager(const IUserManager& usrMgr)
+    : m_userManager(usrMgr)
+{
+}
+
+
+ConnectionManager::~ConnectionManager()
+{
+    for (auto& connection: m_connections)
+        connection.first->close();
+}
+
+
 void ConnectionManager::add(std::unique_ptr<IEncryptedConnection> connection)
 {
-    m_connections.emplace_back(std::move(connection));
+    qDebug() << "registering new connection";
+
+    const auto& users = m_userManager.listUsers();
+    const Botan::Public_Key* public_key = connection->getTheirsPublicKey();
+    std::string public_key_encoded = Botan::X509::PEM_encode(*public_key);
+
+    for(const UserId& userId: users)
+    {
+        const QByteArray pkey = m_userManager.publicKey(userId);
+
+        if (public_key_encoded.c_str() == pkey)
+        {
+            qDebug() << "matched connection to existing user";
+            break;
+        }
+    }
+
+    auto closeConnection = connect(connection.get(), &IEncryptedConnection::connectionClosed,
+                                   std::bind(&ConnectionManager::connectionClosed, this, connection.get()));
+
+    m_connections.emplace(std::move(connection), Connections{closeConnection});
+}
+
+
+void ConnectionManager::connectionClosed(IEncryptedConnection* connection)
+{
+    dropConnection(connection);
+}
+
+
+void ConnectionManager::dropConnection(IEncryptedConnection* connection)
+{
+    auto it = m_connections.find(connection);
+
+    if (it != m_connections.end())
+    {
+        for (auto& connection_obj: it->second)
+            QObject::disconnect(connection_obj);
+
+        m_connections.erase(it);
+    }
 }
