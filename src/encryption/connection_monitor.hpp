@@ -35,6 +35,8 @@ class ConnectionMonitor: public QObject
 {
     public:
         ConnectionMonitor(IConnectionManager &);
+        ~ConnectionMonitor();
+
         void watch(std::unique_ptr<EncryptedConnection>);
 
     private:

@@ -27,6 +27,13 @@ ConnectionMonitor::ConnectionMonitor(IConnectionManager& manager)
 }
 
 
+ConnectionMonitor::~ConnectionMonitor()
+{
+    for (auto& connection: m_waitingForApproval)
+        connection->closeConnection();
+}
+
+
 void ConnectionMonitor::watch(std::unique_ptr<EncryptedConnection> connection)
 {
     connect(connection.get(), &EncryptedConnection::connectionEstablished,
