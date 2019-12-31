@@ -1,26 +1,13 @@
 Arch packages required for android build:
 
-android-ndk
-android-environment
-android-pkg-config
-android-armv7a-eabi-zlib
-java-environment-common
-java-runtime-common
-jre8-openjdk
-jre8-openjdk-headless
-ant
-swt
-android-sdk-build-tools
-android-sdk-platform-tools
-android-configure
-android-armv7a-eabi-libpng
-android-cmake
-android-armv7a-eabi-libjpeg-turbo
-android-armv7a-eabi-openssl
+android-armv7a-eabi-qt5
 jdk8-openjdk
+android-sdk-platform-tools
+android-ndk
+android-sdk-build-tools
 android-sdk
 android-platform-22
-android-armv7a-eabi-qt5
+
 
 cmake parameters to setup android environment:
 -DCMAKE_TOOLCHAIN_FILE:PATH=/opt/android-ndk/build/cmake/android.toolchain.cmake
